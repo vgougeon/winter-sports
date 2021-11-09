@@ -34,9 +34,9 @@ export class Game {
 
         this.light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 5, 0), this.scene);
         
-
-        this.players = [new Player(this, 0), new Player(this, 1)]
         this.sport = new Soccer(this)
+        this.players = [new Player(this, 0)]
+        
 
         this.input = new Input(this)
         this.scene.debugLayer.show();
@@ -49,5 +49,12 @@ export class Game {
 
     model() {
         this.player = new Player(this)
+    }
+
+    setPlayer(player: Player) {
+        this.player = player
+        // this.camera = new BABYLON.ArcFollowCamera('follow', -Math.PI/4, 1.58, 10, this.player.mesh, this.scene)
+        this.camera = new BABYLON.FollowCamera('follow', new BABYLON.Vector3(5, 5, 5), this.scene, player.mesh);
+        (this.camera as BABYLON.FollowCamera).noRotationConstraint = true
     }
 }
