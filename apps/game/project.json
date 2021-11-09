@@ -1,0 +1,61 @@
+{
+  "root": "apps/game",
+  "sourceRoot": "apps/game/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/web:build",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/apps/game",
+        "index": "apps/game/src/index.html",
+        "baseHref": "/",
+        "main": "apps/game/src/main.tsx",
+        "polyfills": "apps/game/src/polyfills.ts",
+        "tsConfig": "apps/game/tsconfig.app.json",
+        "assets": ["apps/game/src/favicon.ico", "apps/game/src/assets"],
+        "styles": ["apps/game/src/styles.scss"],
+        "scripts": [],
+        "webpackConfig": "@nrwl/react/plugins/webpack"
+      },
+      "configurations": {
+        "production": {
+          "fileReplacements": [
+            {
+              "replace": "apps/game/src/environments/environment.ts",
+              "with": "apps/game/src/environments/environment.prod.ts"
+            }
+          ],
+          "optimization": true,
+          "outputHashing": "all",
+          "sourceMap": false,
+          "namedChunks": false,
+          "extractLicenses": true,
+          "vendorChunk": false
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nrwl/web:dev-server",
+      "options": {
+        "buildTarget": "game:build",
+        "hmr": true
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "game:build:production",
+          "hmr": false
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/game/**/*.{ts,tsx,js,jsx}"]
+      }
+    }
+  },
+  "tags": []
+}
