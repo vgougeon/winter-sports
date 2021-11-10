@@ -11,7 +11,8 @@ export class Soccer {
         this.field = BABYLON.MeshBuilder.CreateGround("ground", { width: 150, height: 70 });
         this.field.physicsImpostor = new BABYLON.PhysicsImpostor(this.field, BABYLON.PhysicsImpostor.BoxImpostor, {
             mass: 0,
-            restitution: 0.9
+            restitution: 0.9,
+            friction: 0
         }, this.game.scene);
 
         const redSphere = BABYLON.Mesh.CreateSphere("sphere", 32, 2, this.game.scene);

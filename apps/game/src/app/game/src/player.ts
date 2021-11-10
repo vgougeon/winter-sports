@@ -7,25 +7,38 @@ export class Player {
     game: Game;
     camera: BABYLON.ArcFollowCamera | null = null;
     mesh: BABYLON.AbstractMesh | null = null;
-    speed = 0.15;
+    speed = 0.5;
     index: number;
     constructor(game: Game, index = 0) {
         this.game = game
         this.index = index
 
-        if (index === 0) {
-            this.game.scene.registerBeforeRender(() => {
+
+        this.game.scene.registerBeforeRender(() => {
+            if (index === 0) {
                 let vector = new BABYLON.Vector3(
                     this.game.input.isPressed('LEFT') ? -1 : this.game.input.isPressed('RIGHT') ? 1 : 0,
                     0,
                     this.game.input.isPressed('DOWN') ? -1 : this.game.input.isPressed('UP') ? 1 : 0)
 
-                if(Math.abs(vector.x) + Math.abs(vector.z) === 2) vector = vector.scaleInPlace(this.speed / Math.sqrt(2))
+                if (Math.abs(vector.x) + Math.abs(vector.z) === 2) vector = vector.scaleInPlace(this.speed / Math.sqrt(2))
                 else vector = vector.scaleInPlace(this.speed)
-                if(!vector.equals(new BABYLON.Vector3(0, 0, 0))) this.mesh?.lookAt(this.mesh.position.subtract(vector))
-                if (this.mesh) this.mesh.position = this.mesh.position.add(vector)
-            })
-        }
+                // if (!vector.equals(new BABYLON.Vector3(0, 0, 0))) this.mesh?.lookAt(this.mesh.position.subtract(vector))
+                // if (this.mesh) this.mesh.position = this.mesh.position.add(vector)
+                
+                if(this.mesh) {
+                    this.mesh.physicsImpostor!.applyImpulse(vector, this.mesh.position)
+                    this.mesh.physicsImpostor!.setLinearVelocity(this.mesh.physicsImpostor!.getLinearVelocity()!.scale(.99))
+
+                    this.mesh.lookAt(this.mesh.position.subtract(this.mesh.physicsImpostor!.getLinearVelocity()!))
+                }
+
+            }
+            if(this.mesh){
+                // this.mesh.rotationQuaternion!.y = 90
+            }
+        })
+
         this.init()
     }
 
@@ -33,7 +46,6 @@ export class Player {
         const meshes = await BABYLON.SceneLoader.ImportMeshAsync("", "assets/", "character.glb", this.game.scene)
 
         this.mesh = meshes.meshes[0]
-        
 
         // const body = meshes.meshes.find(mesh => mesh.name === 'PLAYER_primitive0')
 
@@ -42,11 +54,16 @@ export class Player {
         collider.isVisible = false
         this.mesh.addChild(collider)
 
-        collider!.physicsImpostor = new BABYLON.PhysicsImpostor(collider!, BABYLON.PhysicsImpostor.CylinderImpostor, { mass: 0}, this.game.scene)
+
+
+        collider!.physicsImpostor = new BABYLON.PhysicsImpostor(collider!, BABYLON.PhysicsImpostor.CylinderImpostor, { mass: 0 }, this.game.scene)
         collider.position.y += 2.8
-        this.mesh.physicsImpostor = new BABYLON.PhysicsImpostor(this.mesh, BABYLON.PhysicsImpostor.NoImpostor, { mass: 1 }, this.game.scene);
-        
+        this.mesh.physicsImpostor = new BABYLON.PhysicsImpostor(this.mesh, BABYLON.PhysicsImpostor.NoImpostor, { 
+            mass: 1, restitution: 0, damping: 1
+        }, this.game.scene);
+
         this.mesh.position.y = 10
+        this.mesh.rotationQuaternion!.y = 90
         // const physicsRoot = new BABYLON.Mesh("", this.game.scene)
         // physicsRoot.addChild(collider)
         // physicsRoot.addChild(this.mesh)
@@ -57,7 +74,7 @@ export class Player {
 
         // this.mesh.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0, , 0))
 
-        if(this.mesh && this.index === 0) this.game.setPlayer(this)
+        if (this.mesh && this.index === 0) this.game.setPlayer(this)
 
         const shirt = this.findMaterial('Shirt');
         if (this.index === 0) (shirt as any).albedoColor = new BABYLON.Color3(0.85, 0.1, 0.1);
