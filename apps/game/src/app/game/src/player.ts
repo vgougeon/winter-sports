@@ -7,8 +7,8 @@ export class Player {
     game: Game;
     camera: BABYLON.ArcFollowCamera | null = null;
     mesh: BABYLON.AbstractMesh | null = null;
-    speed = 0.15;
-    height = 3;
+    speed = 0.22;
+    height = 5.5;
     index: number;
     collider: BABYLON.Mesh | null = null;
 
@@ -35,12 +35,25 @@ export class Player {
     }
 
     async init() {
-        this.collider = BABYLON.MeshBuilder.CreateBox('player', { width: 1, height: 3, depth: 1}, this.game.scene)
+        const meshes = await BABYLON.SceneLoader.ImportMeshAsync("", "assets/", "character.glb", this.game.scene)
+        this.mesh = meshes.meshes[0]
+        this.mesh.scaling = new BABYLON.Vector3(1, 1, 1)
+        this.mesh.translate(new BABYLON.Vector3(0, 1, 0), 0)
+
+        this.collider = BABYLON.MeshBuilder.CreateBox('player', { width: 2, height: this.height, depth: 1.3}, this.game.scene)
         this.collider.translate(new BABYLON.Vector3(0, 1, 0), this.height / 2, BABYLON.Space.LOCAL)
         this.collider.physicsImpostor = new BABYLON.PhysicsImpostor(this.collider, BABYLON.PhysicsImpostor.BoxImpostor,
             { mass: 0, restitution: 0.1}
         )
-        this.game.shadowGenerator.addShadowCaster(this.collider)
+        this.collider.isVisible = false
+        this.mesh.setParent(this.collider)
+        this.game.shadowGenerator.addShadowCaster(this.mesh)
+
+        const shirt = this.findMaterial('Shirt') as BABYLON.StandardMaterial
+        shirt.emissiveColor = new BABYLON.Color3(0.2, 0, 0)
+        shirt.specularColor = new BABYLON.Color3(0.2, 0, 0)
+        shirt.diffuseColor = new BABYLON.Color3(0.2, 0, 0)
+
         //TODO: switch to this.mesh
     }
 
