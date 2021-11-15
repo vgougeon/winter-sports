@@ -17,7 +17,7 @@
         "assets": ["apps/game/src/favicon.ico", "apps/game/src/assets"],
         "styles": ["apps/game/src/styles.scss"],
         "scripts": [],
-        "webpackConfig": "@nrwl/react/plugins/webpack"
+        "webpackConfig": "apps/game/webpack"
       },
       "configurations": {
         "production": {
@@ -40,7 +40,8 @@
       "executor": "@nrwl/web:dev-server",
       "options": {
         "buildTarget": "game:build",
-        "hmr": true
+        "hmr": true,
+        "webpackConfig": "apps/game/webpack"
       },
       "configurations": {
         "production": {

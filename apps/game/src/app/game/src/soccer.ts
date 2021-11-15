@@ -4,37 +4,63 @@ import 'babylonjs-loaders';
 
 export class Soccer {
     game: Game;
-    field: BABYLON.Mesh
+    ball: BABYLON.Mesh;
+    field: BABYLON.Mesh;
 
     constructor(game: Game) {
         this.game = game
-        this.field = BABYLON.MeshBuilder.CreateGround("ground", { width: 150, height: 70 });
-        this.field.physicsImpostor = new BABYLON.PhysicsImpostor(this.field, BABYLON.PhysicsImpostor.BoxImpostor, {
+
+        this.field = this.generateField()
+        this.ball = this.generateBall()
+
+        game.scene.registerBeforeRender(this.loop.bind(this))
+    }
+
+    loop() {
+        if(this.ball.physicsImpostor) {
+            this.ball.physicsImpostor.setLinearVelocity(
+                this.ball.physicsImpostor.getLinearVelocity()!.scaleInPlace(0.99)
+            )
+
+            this.ball.physicsImpostor.setAngularVelocity(
+                this.ball.physicsImpostor.getAngularVelocity()!.scaleInPlace(0.995)
+            )
+        }
+        
+    }
+
+    generateBall(): BABYLON.Mesh {
+        const ball = BABYLON.Mesh.CreateSphere("sphere", 32, 1, this.game.scene);
+        ball.position = new BABYLON.Vector3(5, 5, 5);
+        ball.physicsImpostor = new BABYLON.PhysicsImpostor(ball, BABYLON.PhysicsImpostor.SphereImpostor, {
+            mass: 1, restitution: 1, friction: 1,
+        }, this.game.scene);
+
+        const ballMaterial = new BABYLON.StandardMaterial("ball", this.game.scene);
+        const texture = new BABYLON.Texture("assets/textures/amiga.jpg", this.game.scene);
+        ballMaterial.ambientTexture = texture
+        ball.material = ballMaterial
+
+        this.game.shadowGenerator.addShadowCaster(ball)
+
+        return ball
+    }
+
+    generateField(): BABYLON.Mesh {
+        const field = BABYLON.MeshBuilder.CreateBox('field', { width: 150, height: 1, depth: 70 })
+        field.physicsImpostor = new BABYLON.PhysicsImpostor(field, BABYLON.PhysicsImpostor.BoxImpostor, {
             mass: 0,
-            restitution: 0.9,
-            friction: 0
+            restitution: 0.5,
+            friction: 10
         }, this.game.scene);
-
-        const redSphere = BABYLON.Mesh.CreateSphere("sphere", 32, 2, this.game.scene);
-        redSphere.position = new BABYLON.Vector3(5, 5, 5);
-        redSphere.physicsImpostor = new BABYLON.PhysicsImpostor(redSphere, BABYLON.PhysicsImpostor.SphereImpostor, {
-            mass: 1, restitution: 0.9, friction: 1
-        }, this.game.scene);
-
-        const redMat = new BABYLON.StandardMaterial("ground", this.game.scene);
-        redMat.diffuseColor = new BABYLON.Color3(0.4, 0.4, 0.4);
-        redMat.specularColor = new BABYLON.Color3(0.4, 0.4, 0.4);
-        redMat.emissiveColor = BABYLON.Color3.Red();
-        redSphere.material = redMat;
-
-        redSphere.physicsImpostor.applyImpulse(new BABYLON.Vector3(1, 2, -1), new BABYLON.Vector3(1, 2, 0));
 
         const grass = new BABYLON.StandardMaterial("grass", this.game.scene);
-        const texture = new BABYLON.Texture("assets/textures/grass.png", this.game.scene);
+        const texture = new BABYLON.Texture("assets/textures/pitch.png", this.game.scene);
         texture.uScale = 10
-        texture.vScale = 10
+        texture.vScale = 5
         grass.ambientTexture = texture
-        this.field.material = grass
-
+        field.material = grass
+        field.receiveShadows = true
+        return field
     }
 }
