@@ -13,9 +13,14 @@ export class Soccer {
     center = new BABYLON.Vector3(0, 0, 0)
     borderHeight = 3
     borderThickness = 1
+    goalWidth = this.depth / 4
+    goalHeight = 13
 
     lines: BABYLON.Mesh[] = []
     borders: BABYLON.Mesh[] = []
+
+    redGoal: BABYLON.Mesh[] = []
+    blueGoal: BABYLON.Mesh[] = []
 
     constructor(game: Game) {
         this.game = game
@@ -23,6 +28,7 @@ export class Soccer {
         this.field = this.generateField()
         this.ball = this.generateBall()
         this.generateBorders()
+        this.generateGoals()
 
         game.scene.registerBeforeRender(this.loop.bind(this))
     }
@@ -67,7 +73,7 @@ export class Soccer {
         }, this.game.scene);
 
         const grass = new BABYLON.StandardMaterial("grass", this.game.scene);
-        const texture = new BABYLON.Texture("assets/textures/sand.jpg", this.game.scene);
+        const texture = new BABYLON.Texture("assets/textures/clay.jpg", this.game.scene);
         texture.uScale = 8
         texture.vScale = 8
         grass.ambientTexture = texture
@@ -118,6 +124,8 @@ export class Soccer {
 
     generateBorders() {
         const physics = { mass : 0, restitution: 3 }
+
+        //SIDES
         this.borders[0] = BABYLON.MeshBuilder.CreateBox('border1', { width: this.width, height: 5, depth: this.borderThickness })
         this.borders[0].position = new BABYLON.Vector3(0, this.borderHeight / 2 , this.depth / 2 + this.borderThickness / 2)
         this.borders[0].physicsImpostor = new BABYLON.PhysicsImpostor(
@@ -129,5 +137,85 @@ export class Soccer {
         this.borders[1].physicsImpostor = new BABYLON.PhysicsImpostor(
             this.borders[1], BABYLON.PhysicsImpostor.BoxImpostor, physics
         )
+
+        //GOAL EDGES
+        this.borders[2] = BABYLON.MeshBuilder.CreateBox('border2', 
+            { width: (this.depth - this.goalWidth) / 2, height: 5, depth: this.borderThickness }
+        )
+        this.borders[2].position = new BABYLON.Vector3(
+            - this.width / 2 - this.borderThickness / 2, 
+            this.borderHeight / 2 ,
+            (- this.goalWidth / 2) - (this.depth - this.goalWidth) / 4
+        )
+        this.borders[2].rotation.y = Math.PI/2
+        this.borders[2].physicsImpostor = new BABYLON.PhysicsImpostor(
+            this.borders[2], BABYLON.PhysicsImpostor.BoxImpostor, physics
+        )
+
+        this.borders[3] = BABYLON.MeshBuilder.CreateBox('border2', 
+            { width: (this.depth - this.goalWidth) / 2, height: 5, depth: this.borderThickness }
+        )
+        this.borders[3].position = new BABYLON.Vector3(
+            - this.width / 2 - this.borderThickness / 2, 
+            this.borderHeight / 2 ,
+            (this.goalWidth / 2) + (this.depth - this.goalWidth) / 4
+        )
+        this.borders[3].rotation.y = Math.PI/2
+        this.borders[3].physicsImpostor = new BABYLON.PhysicsImpostor(
+            this.borders[3], BABYLON.PhysicsImpostor.BoxImpostor, physics
+        )
+
+        this.borders[4] = BABYLON.MeshBuilder.CreateBox('border2', 
+            { width: (this.depth - this.goalWidth) / 2, height: 5, depth: this.borderThickness }
+        )
+        this.borders[4].position = new BABYLON.Vector3(
+            this.width / 2 + this.borderThickness / 2, 
+            this.borderHeight / 2 ,
+            (this.goalWidth / 2) + (this.depth - this.goalWidth) / 4
+        )
+        this.borders[4].rotation.y = Math.PI/2
+        this.borders[4].physicsImpostor = new BABYLON.PhysicsImpostor(
+            this.borders[4], BABYLON.PhysicsImpostor.BoxImpostor, physics
+        )
+
+        this.borders[5] = BABYLON.MeshBuilder.CreateBox('border2', 
+            { width: (this.depth - this.goalWidth) / 2, height: 5, depth: this.borderThickness }
+        )
+        this.borders[5].position = new BABYLON.Vector3(
+            this.width / 2 + this.borderThickness / 2, 
+            this.borderHeight / 2 ,
+            (- this.goalWidth / 2) - (this.depth - this.goalWidth) / 4
+        )
+        this.borders[5].rotation.y = Math.PI/2
+        this.borders[5].physicsImpostor = new BABYLON.PhysicsImpostor(
+            this.borders[5], BABYLON.PhysicsImpostor.BoxImpostor, physics
+        )
+
+    }
+
+    generateGoals() {
+        this.redGoal[0] = BABYLON.MeshBuilder.CreateCylinder('redpost1', {height: this.goalHeight, diameter: 1.5, tessellation: 8})
+        this.redGoal[0].position = new BABYLON.Vector3(this.width / 2, this.goalHeight / 2 - 1, this.goalWidth / 2)
+        this.redGoal[0].physicsImpostor = new BABYLON.PhysicsImpostor(this.redGoal[0], BABYLON.PhysicsImpostor.CylinderImpostor, { mass: 0})
+
+        this.redGoal[1] = BABYLON.MeshBuilder.CreateCylinder('redpost2', {height: this.goalHeight, diameter: 1.5, tessellation: 8})
+        this.redGoal[1].position = new BABYLON.Vector3(this.width / 2, this.goalHeight / 2 - 1, - this.goalWidth / 2)
+        this.redGoal[1].physicsImpostor = new BABYLON.PhysicsImpostor(this.redGoal[1], BABYLON.PhysicsImpostor.CylinderImpostor, { mass: 0})
+
+        this.redGoal[2] = BABYLON.MeshBuilder.CreateCylinder('redcrossbar', {height: this.goalWidth, diameter: 1.5, tessellation: 8})
+        this.redGoal[2].position = new BABYLON.Vector3(this.width / 2, this.goalHeight - 1, 0)
+        this.redGoal[2].rotation.x = Math.PI / 2
+
+        this.blueGoal[0] = BABYLON.MeshBuilder.CreateCylinder('bluepost1', {height: this.goalHeight, diameter: 1.5, tessellation: 8})
+        this.blueGoal[0].position = new BABYLON.Vector3(-this.width / 2, this.goalHeight / 2 - 1, this.goalWidth / 2)
+        this.blueGoal[0].physicsImpostor = new BABYLON.PhysicsImpostor(this.blueGoal[0], BABYLON.PhysicsImpostor.CylinderImpostor, { mass: 0})
+
+        this.blueGoal[1] = BABYLON.MeshBuilder.CreateCylinder('bluepost2', {height: this.goalHeight, diameter: 1.5, tessellation: 8})
+        this.blueGoal[1].position = new BABYLON.Vector3(-this.width / 2, this.goalHeight / 2 - 1, - this.goalWidth / 2)
+        this.blueGoal[1].physicsImpostor = new BABYLON.PhysicsImpostor(this.blueGoal[1], BABYLON.PhysicsImpostor.CylinderImpostor, { mass: 0})
+
+        this.blueGoal[2] = BABYLON.MeshBuilder.CreateCylinder('bluecrossbar', {height: this.goalWidth, diameter: 1.5, tessellation: 8})
+        this.blueGoal[2].position = new BABYLON.Vector3(-this.width / 2, this.goalHeight - 1, 0)
+        this.blueGoal[2].rotation.x = Math.PI / 2
     }
 }
