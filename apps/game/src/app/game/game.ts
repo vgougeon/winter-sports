@@ -29,7 +29,7 @@ export class Game {
 
 
         this.hemisphericLight = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 2, 0), this.scene);
-        this.hemisphericLight.intensity = 0.7
+        this.hemisphericLight.intensity = 0.85
 
         this.light = new BABYLON.DirectionalLight("light", new BABYLON.Vector3(-1, -2, -1), this.scene);
         this.light.intensity = 1
@@ -41,7 +41,7 @@ export class Game {
 
         this.input = new Input(this)
 
-        // this.scene.debugLayer.show();
+        this.scene.debugLayer.show();
 
         this.engine.runRenderLoop(() => {
             this.scene.render();
