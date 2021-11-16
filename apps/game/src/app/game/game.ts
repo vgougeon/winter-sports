@@ -20,10 +20,13 @@ export class Game {
 
     sport: Soccer | null = null;
     input: Input;
+    gamepad: BABYLON.GamepadManager;
+    canvas: HTMLCanvasElement;
 
     constructor(canvas: HTMLCanvasElement) {
         this.engine = new BABYLON.Engine(canvas, true)
         this.scene = new BABYLON.Scene(this.engine)
+        this.canvas = canvas
         this.camera = new BABYLON.ArcRotateCamera('main', -Math.PI / 2, 1.58, 10, new BABYLON.Vector3(0, 1, 0), this.scene)
         this.camera.attachControl(canvas, true)
 
@@ -34,13 +37,14 @@ export class Game {
         this.light = new BABYLON.DirectionalLight("light", new BABYLON.Vector3(-1, -2, -1), this.scene);
         this.light.intensity = 1
         this.light.position = new BABYLON.Vector3(20, 40, 20);
-        this.shadowGenerator = new BABYLON.ShadowGenerator(1024, this.light)
+        this.shadowGenerator = new BABYLON.ShadowGenerator(10000, this.light)
 
         this.init()
         this.generateSkybox()
 
+        this.gamepad = new BABYLON.GamepadManager()
         this.input = new Input(this)
-
+        
         this.scene.debugLayer.show();
 
         this.engine.runRenderLoop(() => {
@@ -86,8 +90,6 @@ export class Game {
 
     setPlayer(player: Player) {
         this.player = player
-        // this.camera = new BABYLON.ArcFollowCamera('follow', -Math.PI/4, 1.58, 10, this.player.mesh, this.scene)
-        this.camera = new BABYLON.FollowCamera('follow', new BABYLON.Vector3(5, 5, 5), this.scene, player.mesh);
-        (this.camera as BABYLON.FollowCamera).noRotationConstraint = true
+        if(this.player.camera) this.scene.switchActiveCamera(this.player.camera, true)
     }
 }

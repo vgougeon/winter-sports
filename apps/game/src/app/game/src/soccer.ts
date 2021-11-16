@@ -7,16 +7,17 @@ export class Soccer {
     ball: BABYLON.Mesh;
     field: BABYLON.Mesh;
 
-    width = 130
-    depth = 80
+    width = 300
+    depth = 160
     lineThickness = 1
     center = new BABYLON.Vector3(0, 0, 0)
     borderHeight = 5
     borderThickness = 1
-    goalWidth = this.depth / 4
+    goalWidth = this.depth / 6
     goalHeight = 13
 
     ads: BABYLON.VideoTexture;
+    adsWide: BABYLON.VideoTexture;
 
     lines: BABYLON.Mesh[] = []
     borders: BABYLON.Mesh[] = []
@@ -33,8 +34,14 @@ export class Soccer {
             { autoPlay: false, muted: true, autoUpdateTexture: true, loop: true })
         this.ads.vScale = 0.6
         this.ads.vOffset = 0.15
+        this.adsWide = new BABYLON.VideoTexture('video', "assets/video/out.mp4", this.game.scene, undefined, undefined, undefined,
+            { autoPlay: false, muted: true, autoUpdateTexture: true, loop: true })
+        this.adsWide.vScale = 0.6
+        this.adsWide.vOffset = 0.15
+        this.adsWide.uScale = 3
         this.game.scene.onPointerDown = () => {
             this.ads.video.play();
+            this.adsWide.video.play();
         };
 
         this.generateBorders()
@@ -55,11 +62,16 @@ export class Soccer {
             )
         }
 
+        if(this.ball) {
+            if(this.ball.position.y < 0.5) {
+                this.ball = this.generateBall()
+            }
+        }
     }
 
     generateBall(): BABYLON.Mesh {
-        const ball = BABYLON.Mesh.CreateSphere("sphere", 32, 1.5, this.game.scene);
-        ball.position = new BABYLON.Vector3(5, 5, 5);
+        const ball = BABYLON.Mesh.CreateSphere("sphere", 32, 2, this.game.scene);
+        ball.position = new BABYLON.Vector3(0, 1, 0);
         ball.physicsImpostor = new BABYLON.PhysicsImpostor(ball, BABYLON.PhysicsImpostor.SphereImpostor, {
             mass: 1, restitution: 1, friction: 1,
         }, this.game.scene);
@@ -69,7 +81,9 @@ export class Soccer {
         ballMaterial.ambientTexture = texture
         ball.material = ballMaterial
 
+        
         this.game.shadowGenerator.addShadowCaster(ball)
+        ball.applyImpulse(new BABYLON.Vector3(0, 50, 0), new BABYLON.Vector3(0, 0, 0))
 
         return ball
     }
@@ -79,12 +93,12 @@ export class Soccer {
         field.position.y = -0.51
         field.physicsImpostor = new BABYLON.PhysicsImpostor(field, BABYLON.PhysicsImpostor.BoxImpostor, {
             mass: 0,
-            restitution: 0.5,
+            restitution: 1,
             friction: 10
         }, this.game.scene);
 
         const grass = new BABYLON.StandardMaterial("grass", this.game.scene);
-        const texture = new BABYLON.Texture("assets/textures/pitch.png", this.game.scene);
+        const texture = new BABYLON.Texture("assets/textures/clay.jpg", this.game.scene);
         texture.uScale = 8
         texture.vScale = 8
         grass.ambientTexture = texture
@@ -134,7 +148,7 @@ export class Soccer {
     }
 
     generateBorders() {
-        const physics = { mass: 0, restitution: 3 }
+        const physics = { mass: 0, restitution: 1 }
 
         //SIDES
         this.borders[0] = BABYLON.MeshBuilder.CreateBox('border1', { width: this.width, height: this.borderHeight, depth: this.borderThickness })
@@ -145,6 +159,7 @@ export class Soccer {
 
         this.borders[1] = BABYLON.MeshBuilder.CreateBox('border1', { width: this.width, height: this.borderHeight, depth: this.borderThickness })
         this.borders[1].position = new BABYLON.Vector3(0, this.borderHeight / 2, - this.depth / 2 - this.borderThickness / 2)
+        this.borders[1].rotation.z = Math.PI
         this.borders[1].physicsImpostor = new BABYLON.PhysicsImpostor(
             this.borders[1], BABYLON.PhysicsImpostor.BoxImpostor, physics
         )
@@ -208,11 +223,18 @@ export class Soccer {
         material.diffuseTexture = this.ads
         material.roughness = 1;
 
+        const wideMaterial = new BABYLON.StandardMaterial("adsWide", this.game.scene);
+        wideMaterial.diffuseTexture = this.adsWide
+        wideMaterial.roughness = 1;
+        
+
 
         this.borders[5].material = material
         this.borders[4].material = material
         this.borders[3].material = material
         this.borders[2].material = material
+        this.borders[1].material = wideMaterial
+        this.borders[0].material = wideMaterial
     }
 
     generateGoals() {
