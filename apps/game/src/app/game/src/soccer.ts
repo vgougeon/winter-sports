@@ -7,8 +7,8 @@ export class Soccer {
     ball: BABYLON.Mesh;
     field: BABYLON.Mesh;
 
-    width = 300
-    depth = 160
+    width = 160
+    depth = 90
     lineThickness = 1
     center = new BABYLON.Vector3(0, 0, 0)
     borderHeight = 5
