@@ -41,7 +41,8 @@
       "options": {
         "buildTarget": "game:build",
         "hmr": true,
-        "webpackConfig": "apps/game/webpack"
+        "webpackConfig": "apps/game/webpack",
+        "proxyConfig": "apps/game/proxy.conf.json"
       },
       "configurations": {
         "production": {

@@ -15,7 +15,9 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@winter-sports/game-lib": ["libs/game-lib/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

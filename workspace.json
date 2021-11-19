@@ -1,6 +1,8 @@
 {
   "version": 2,
   "projects": {
-    "game": "apps/game"
+    "api": "apps/api",
+    "game": "apps/game",
+    "game-lib": "libs/game-lib"
   }
 }
