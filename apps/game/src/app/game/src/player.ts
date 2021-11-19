@@ -1,4 +1,4 @@
-import { Game } from "../game";
+import { Game } from "../gameOld";
 import * as BABYLON from 'babylonjs';
 import 'babylonjs-loaders';
 

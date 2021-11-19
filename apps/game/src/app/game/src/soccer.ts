@@ -1,4 +1,4 @@
-import { Game } from "../game";
+import { Game } from "../gameOld";
 import * as BABYLON from 'babylonjs';
 import 'babylonjs-loaders';
 
@@ -7,8 +7,8 @@ export class Soccer {
     ball: BABYLON.Mesh;
     field: BABYLON.Mesh;
 
-    width = 160
-    depth = 90
+    width = 200
+    depth = 130
     lineThickness = 1
     center = new BABYLON.Vector3(0, 0, 0)
     borderHeight = 5

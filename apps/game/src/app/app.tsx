@@ -5,7 +5,6 @@ import Ammo from 'ammo.js'
 export function App() {
   const ref = useRef<HTMLCanvasElement>(null)
   const init = async () => {
-    await Ammo()
     new Game(ref.current!)
   }
   useLayoutEffect(() => {
