@@ -1,6 +1,5 @@
 import { useLayoutEffect, useRef } from "react";
 import { Game } from './game/game';
-import Ammo from 'ammo.js'
 
 require('./services/socket.service')
 
