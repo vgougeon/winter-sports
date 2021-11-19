@@ -10,7 +10,7 @@ const http = require('http');
 const server = http.createServer(app);
 
 export const io: SocketIO.Server = socketIO(server, {
-  path: "/socket/",
+  path: "/api/socket/",
   // cors: {
   //   origin: process.env.ORIGIN_URL,
   //   methods: ["GET", "POST", "PUT", "PATCH"],

@@ -2,6 +2,8 @@ import { useLayoutEffect, useRef } from "react";
 import { Game } from './game/game';
 import Ammo from 'ammo.js'
 
+require('./services/socket.service')
+
 export function App() {
   const ref = useRef<HTMLCanvasElement>(null)
   const init = async () => {
