@@ -1,6 +1,9 @@
 import { useLayoutEffect, useRef } from "react";
-import { Game } from './game/game';
 import socketService from "./services/socket.service";
+import store from './store/store'
+import { Provider } from 'react-redux'
+import Queue from "./interface/absolute/queue";
+import Performance from "./interface/absolute/performance";
 
 export function App() {
   const ref = useRef<HTMLCanvasElement>(null)
@@ -11,7 +14,11 @@ export function App() {
     init()
   }, [])
   return (
-    <canvas ref={ ref }></canvas>
+    <Provider store={store}>
+      <Queue />
+      <Performance />
+      <canvas ref={ ref }></canvas>
+    </Provider>
   );
 }
 

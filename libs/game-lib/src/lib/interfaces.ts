@@ -2,6 +2,8 @@ export interface IGameState {
     ball: {
         position: BABYLON.Vector3;
         rotation: BABYLON.Vector3;
+        angularVelocity: BABYLON.Vector3;
+        linearVelocity: BABYLON.Vector3;
     }
     players: IPlayerState[],
     teams: {
@@ -16,6 +18,7 @@ export interface IPlayerState {
     name: string;
     position?: BABYLON.Vector3;
     velocity?: BABYLON.Vector3;
+    ping?: number;
 }
 
 export interface IGameOptions {
@@ -27,4 +30,13 @@ export interface IGameMode {
     name: 'Soccer' | 'Beach Volley';
     fieldWidth?: number;
     fieldHeight?: number;
+}
+
+export interface IGInfo {
+    gameMode: IGameMode,
+    playerId: string;
+}
+
+export interface IInputMap {
+    [key: string]: number;
 }

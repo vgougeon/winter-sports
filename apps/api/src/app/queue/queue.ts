@@ -20,20 +20,21 @@ class Queue {
     }
 
     createGame(players: PlayerSocket[]) {
+        console.log("CREATING GAME...")
         gamesManager.createGame(players)
+        console.log(`${gamesManager.games.length} total games`)
     }
-
 
     addPlayer(socket: PlayerSocket) {
         if(this.players.find(player => player === socket)) return
         this.players.push(socket)
-        console.log("ADDED TO QUEUE")
-
+        console.log(`${this.players.length} in queue`)
         this.sendQueueStateToPlayer(socket)
     }
 
     removePlayer(socket: PlayerSocket) {
         this.players = this.players.filter(player => player !== socket)
+        socket.emit('queueLeft')
     }
 
     queueState() {

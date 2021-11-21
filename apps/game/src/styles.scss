@@ -1,5 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
+@tailwind components;
+@tailwind base;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Oxygen:wght@300&family=Poppins:wght@100;200;300;400;500;600;700;800&display=swap');
+
 body {
+    font-family: 'Poppins';
     margin: 0;
 }
 
@@ -8,4 +15,21 @@ canvas {
     height: 100vh;
     margin: 0;
     display: block;
+}
+
+.text-border {
+    text-shadow: 0 0 3px #000;
+}
+
+.text-border-sm {
+    text-shadow: 0 0 2px #000;
+}
+
+.rotate {
+    animation: rotate 4s infinite linear;
+}
+
+@keyframes rotate {
+    from { transform: rotateZ(0deg) }
+    to { transform: rotateZ(360deg) }
 }

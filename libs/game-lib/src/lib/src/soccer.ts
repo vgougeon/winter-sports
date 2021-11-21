@@ -60,6 +60,7 @@ export class Soccer {
 
         if(this.ball) {
             if(this.ball.position.y < 0.5) {
+                this.ball.dispose()
                 this.ball = this.generateBall()
             }
         }

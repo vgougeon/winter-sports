@@ -1,22 +1,22 @@
 import { PlayerSocket } from '../../types/player-socket.interface';
 import * as BABYLON from 'babylonjs';
-import { Game as GameInstance } from '@winter-sports/game-lib';
-import { Player } from '@winter-sports/game-lib';
-import { IGameMode } from './../../../../../libs/game-lib/src/lib/interfaces';
-
+import { Game as GameInstance, TICK_RATE, Player, IGameMode, IGInfo, IInputMap } from '@winter-sports/game-lib';
+import dayjs from 'dayjs';
 export class Game {
     engine: BABYLON.Engine
     game: GameInstance
     loopIntervalId: NodeJS.Timeout
-    tickRate = 60
+    pingIntervalId: NodeJS.Timeout
+    tickRate = TICK_RATE
     players: PlayerSocket[]
-    playerMap: Player[] = []
 
     gameMode: IGameMode = {
         name: 'Soccer',
         fieldWidth: 200,
         fieldHeight: 120
     }
+
+    lastPing = { time: dayjs(), code: Math.random()}
 
     gameState: any = {}
 
@@ -32,10 +32,11 @@ export class Game {
         await this.game.init()
         await this.game.startGameMode(this.gameMode)
 
-        this.initPlayer(this.players[0])
+        for(let player of this.players) this.initPlayer(player)
         this.initialGameState()
 
         this.loopIntervalId = setInterval(this.loop.bind(this), 1000 / this.tickRate)
+        this.pingIntervalId = setInterval(this.ping.bind(this), 2000)
 
         setTimeout(() => {
             this.game.sport.ball.applyImpulse(
@@ -43,6 +44,21 @@ export class Game {
                 new BABYLON.Vector3(0, 0, 0)
             )
         }, 3000)
+    }
+
+    ping() {
+        console.log(this.players.map(p => p.ping))
+        this.lastPing = { time: dayjs(), code: Math.random() }
+        for(let player of this.players) player.emit('ping', this.lastPing.code)
+    }
+
+
+    pong(socket: PlayerSocket, code: number) {
+        if(code === this.lastPing.code) {
+            socket.ping = dayjs().diff(this.lastPing.time)
+            const player = this.game.players.find(p => p.state.id === socket.id)
+            player.state.ping = socket.ping
+        }
     }
 
     initialGameState() {
@@ -56,19 +72,33 @@ export class Game {
     }
 
     updateGameState() {
+        const ball = this.game.sport.ball
+        const ballAngularVelocity = ball.physicsImpostor.getAngularVelocity()
+        const ballLinearVelocity = ball.physicsImpostor.getLinearVelocity()
+
         this.gameState.ball = {
             position:  { 
-                x: this.game.sport.ball.position.x,
-                y: this.game.sport.ball.position.y,
-                z: this.game.sport.ball.position.z
+                x: ball.position.x,
+                y: ball.position.y,
+                z: ball.position.z
             },
             rotation:  { 
-                x: this.game.sport.ball.rotation.x,
-                y: this.game.sport.ball.rotation.y,
-                z: this.game.sport.ball.rotation.z
-            }
+                x: ball.rotation.x,
+                y: ball.rotation.y,
+                z: ball.rotation.z
+            },
+            angularVelocity: {
+                x: ballAngularVelocity.x,
+                y: ballAngularVelocity.y,
+                z: ballAngularVelocity.z
+            },
+            linearVelocity: {
+                x: ballLinearVelocity.x,
+                y: ballLinearVelocity.y,
+                z: ballLinearVelocity.z
+            },
         }
-        this.gameState.players = this.playerMap.map(player => ({
+        this.gameState.players = this.game.players.map(player => ({
             ...player.state,
             position: {
                 x: player.collider.position.x,
@@ -86,23 +116,30 @@ export class Game {
     initPlayer(player: PlayerSocket) {
         const createPlayer = new Player(this.game, { 
             id: player.id, 
-            teamId: 0,
+            teamId: this.game.players.length % 2,
             name: player.pseudo || 'NO_NAME'
         })
-        this.playerMap.push(createPlayer)
+        this.game.players.push(createPlayer)
 
-        player.on('i', this.input.bind(this))
+        player.on('i', this.input.bind(this, player))
+        player.on('ping', this.pong.bind(this, player))
         player.on('disconnect', () => {
             this.game.scene.dispose()
             clearInterval(this.loopIntervalId)
             //TODO: This logic will shutdown server if a player leave, to be modified
         })
 
-        player.emit('gInfo', this.gameMode)
+        player.emit('gInfo', {
+            gameMode: this.gameMode,
+            playerId: player.id
+        } as IGInfo)
     }
 
-    input(player: PlayerSocket) {
-
+    input(player: PlayerSocket, inputs: IInputMap) {
+        const playerInstance = this.game.players.find(p => p.state.id === player.id)
+        if(playerInstance) {
+            playerInstance.currentInputs = inputs
+        }
     }
 
     loop() {
