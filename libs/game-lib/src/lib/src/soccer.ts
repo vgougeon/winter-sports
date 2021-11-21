@@ -1,6 +1,8 @@
 import { Game } from "../game-lib";
 import * as BABYLON from 'babylonjs';
 import 'babylonjs-loaders';
+import { IPlayerState } from "../interfaces";
+import { Player } from "./player";
 
 export class Soccer {
     game: Game;
@@ -19,6 +21,8 @@ export class Soccer {
     // ads: BABYLON.VideoTexture;
     // adsWide: BABYLON.VideoTexture;
 
+    players: any[] = []
+
     lines: BABYLON.Mesh[] = []
     borders: BABYLON.Mesh[] = []
 
@@ -27,6 +31,11 @@ export class Soccer {
 
     constructor(game: Game) {
         this.game = game
+        if(this.game.gameMode) {
+            this.width = this.game.gameMode.fieldWidth!
+            this.depth = this.game.gameMode.fieldHeight!
+        }
+        
 
         this.field = this.generateField()
         this.ball = this.generateBall()
@@ -63,10 +72,15 @@ export class Soccer {
             mass: 1, restitution: 1, friction: 1,
         }, this.game.scene);
 
-        
-        this.game.shadowGenerator.addShadowCaster(ball)
-        ball.applyImpulse(new BABYLON.Vector3(0, 50, 0), new BABYLON.Vector3(0, 0, 0))
+        if(!this.game.options.isServer) {
+            const ballMaterial = new BABYLON.StandardMaterial("ball", this.game.scene);
+            const texture = new BABYLON.Texture("assets/textures/amiga.jpg", this.game.scene);
+            ballMaterial.ambientTexture = texture
+            ball.material = ballMaterial
 
+            this.game.shadowGenerator.addShadowCaster(ball)
+        }
+        
         return ball
     }
 
@@ -81,7 +95,17 @@ export class Soccer {
 
         field.receiveShadows = true
 
-        this.drawLines()
+        if(!this.game.options.isServer) {
+            const grass = new BABYLON.StandardMaterial("grass", this.game.scene);
+            const texture = new BABYLON.Texture("assets/textures/clay.jpg", this.game.scene);
+            texture.uScale = 8
+            texture.vScale = 8
+            grass.ambientTexture = texture
+            field.material = grass
+            field.receiveShadows = true
+
+            this.drawLines()
+        }
 
         return field
     }

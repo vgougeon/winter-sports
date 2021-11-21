@@ -7,7 +7,10 @@ export class Game {
 
     constructor(canvas: HTMLCanvasElement) {
         this.engine = new BABYLON.Engine(canvas, true)
-        this.game = new GameInstance(this.engine, canvas)
-        socketService.game = this.game
+        this.game = new GameInstance(this.engine, { canvas: canvas })
+    }
+
+    async init() {
+        await this.game.init()
     }
 }

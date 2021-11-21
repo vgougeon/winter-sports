@@ -1,6 +1,7 @@
 import { Game } from "../game-lib";
 import * as BABYLON from 'babylonjs';
 import 'babylonjs-loaders';
+import { IPlayerState } from "../interfaces";
 
 export class Player {
     game: Game;
@@ -8,7 +9,7 @@ export class Player {
     mesh: BABYLON.AbstractMesh | null = null;
     speed = 0.05;
     height = 5.5;
-    index: number;
+    state: IPlayerState;
     collider: BABYLON.Mesh | null = null;
 
     cameraHeight = 20
@@ -19,9 +20,9 @@ export class Player {
 
     animations: BABYLON.AnimationGroup[] = []
 
-    constructor(game: Game, index = 0) {
+    constructor(game: Game, state: IPlayerState) {
         this.game = game
-        this.index = index
+        this.state = state
 
         this.game.scene.registerBeforeRender(this.loop.bind(this))
 
@@ -29,7 +30,7 @@ export class Player {
     }
 
     loop() {
-        if (this.index === 0) {
+        if (this.state.id === '0') {
             this.acceleration = new BABYLON.Vector3(
                 // this.game.input.isPressed('DOWN') * -1 + this.game.input.isPressed('UP'), 0,
                 // this.game.input.isPressed('RIGHT') * -1 + this.game.input.isPressed('LEFT')

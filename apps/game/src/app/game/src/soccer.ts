@@ -83,7 +83,6 @@ export class Soccer {
 
         
         this.game.shadowGenerator.addShadowCaster(ball)
-        ball.applyImpulse(new BABYLON.Vector3(0, 50, 0), new BABYLON.Vector3(0, 0, 0))
 
         return ball
     }
