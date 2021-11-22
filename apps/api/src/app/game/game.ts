@@ -1,7 +1,9 @@
 import { PlayerSocket } from '../../types/player-socket.interface';
 import * as BABYLON from 'babylonjs';
 import { Game as GameInstance, TICK_RATE, Player, IGameMode, IGInfo, IInputMap } from '@winter-sports/game-lib';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
+import duration from 'dayjs/plugin/duration'
+dayjs.extend(duration)
 export class Game {
     engine: BABYLON.Engine
     game: GameInstance
@@ -13,8 +15,11 @@ export class Game {
     gameMode: IGameMode = {
         name: 'Soccer',
         fieldWidth: 200,
-        fieldHeight: 120
+        fieldHeight: 120,
+        time: 60 * 5
     }
+
+    gameStartAt?: Dayjs;
 
     lastPing = { time: dayjs(), code: Math.random()}
 
@@ -31,6 +36,16 @@ export class Game {
     async init() {
         await this.game.init()
         await this.game.startGameMode(this.gameMode)
+
+        this.game.sport.subscriptions.blueGoal = () => {
+            this.gameState.teams[0].score += 1
+        }
+
+        this.game.sport.subscriptions.redGoal = () => {
+            this.gameState.teams[1].score += 1
+        }
+
+        this.gameStartAt = dayjs()
 
         for(let player of this.players) this.initPlayer(player)
         this.initialGameState()
@@ -50,7 +65,6 @@ export class Game {
         this.lastPing = { time: dayjs(), code: Math.random() }
         for(let player of this.players) player.emit('ping', this.lastPing.code)
     }
-
 
     pong(socket: PlayerSocket, code: number) {
         if(code === this.lastPing.code) {
@@ -75,6 +89,7 @@ export class Game {
         const ballAngularVelocity = ball.physicsImpostor.getAngularVelocity()
         const ballLinearVelocity = ball.physicsImpostor.getLinearVelocity()
 
+        this.gameState.timer = dayjs.duration(this.gameStartAt.add(5, 'minutes').diff(dayjs())).format('m:ss')
         this.gameState.ball = {
             position:  { 
                 x: ball.position.x,

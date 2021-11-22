@@ -5,6 +5,7 @@ import { Game } from './../game/game';
 import { setFPS, setOnline, setPing } from "../store/socketSlice";
 import store from "../store/store";
 import { setQueue } from "../store/queueSlice";
+import { setTeam1, setTeam2, setTimer } from "../store/gameSlice";
 export class SocketService {
     socket: Socket | null = null;
     game: GameInstance | null = null;
@@ -50,8 +51,12 @@ export class SocketService {
     }
 
     state(state: IGameState) {
-
+        const uiState = store.getState()
         this.game?.updateGame(state)
+
+        if(uiState.game.timer !== state.timer) store.dispatch(setTimer(state.timer))
+        if(uiState.game.team1 !== state.teams[0].score) store.dispatch(setTeam1(state.teams[0].score))
+        if(uiState.game.team2 !== state.teams[1].score) store.dispatch(setTeam2(state.teams[1].score))
         const self = this.game?.players.find(p => p.state.id === this.game?.playerId)
         const selfNew = state.players.find(p => p.id === this.game?.playerId)
         if(self && self.state.ping !== selfNew?.ping) {

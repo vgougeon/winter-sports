@@ -9,7 +9,8 @@ export interface IGameState {
     teams: {
         id: number;
         score: number;
-    }[]
+    }[],
+    timer: string;
 }
 
 export interface IPlayerState {
@@ -30,6 +31,7 @@ export interface IGameMode {
     name: 'Soccer' | 'Beach Volley';
     fieldWidth?: number;
     fieldHeight?: number;
+    time?: number; //seconds
 }
 
 export interface IGInfo {

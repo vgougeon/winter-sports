@@ -27,6 +27,13 @@ export class Soccer {
     redGoal: BABYLON.Mesh[] = []
     blueGoal: BABYLON.Mesh[] = []
 
+    redGoalZone?: BABYLON.Mesh
+    blueGoalZone?: BABYLON.Mesh
+
+    subscriptions: {
+        [key: string]: Function
+    } = {}
+
     constructor(game: Game) {
         this.game = game
         if (this.game.gameMode) {
@@ -51,11 +58,13 @@ export class Soccer {
         }
 
 
-        this.field = this.generateField()
+        this.generateGoals()
         this.ball = this.generateBall()
 
+        this.field = this.generateField()
         this.generateBorders()
-        this.generateGoals()
+
+
 
 
         game.scene.registerBeforeRender(this.loop.bind(this))
@@ -95,6 +104,24 @@ export class Soccer {
 
             this.game.shadowGenerator.addShadowCaster(ball)
         }
+        ball.actionManager = new BABYLON.ActionManager(this.game.scene)
+
+        ball.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+            {
+                trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger,
+                parameter: this.game.scene.getMeshByName("redGoalZone"),
+            }, () => {
+                ball.actionManager?.dispose()
+                this.subscriptions.redGoal?.()
+            }));
+        ball.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+            {
+                trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger,
+                parameter: this.game.scene.getMeshByName("blueGoalZone"),
+            }, () => {
+                ball.actionManager?.dispose()
+                this.subscriptions.blueGoal?.()
+            }));
 
         return ball
     }
@@ -112,9 +139,9 @@ export class Soccer {
 
         if (!this.game.options.isServer) {
             const grass = new BABYLON.StandardMaterial("grass", this.game.scene);
-            const texture = new BABYLON.Texture("assets/textures/clay.jpg", this.game.scene);
-            texture.uScale = 8
-            texture.vScale = 8
+            const texture = new BABYLON.Texture("assets/textures/pitch2.png", this.game.scene);
+            texture.uScale = 6
+            texture.vScale = 12
             grass.ambientTexture = texture
             field.material = grass
             field.receiveShadows = true
@@ -278,5 +305,30 @@ export class Soccer {
         this.blueGoal[2] = BABYLON.MeshBuilder.CreateCylinder('bluecrossbar', { height: this.goalWidth, diameter: 1.5, tessellation: 8 })
         this.blueGoal[2].position = new BABYLON.Vector3(-this.width / 2, this.goalHeight - 1, 0)
         this.blueGoal[2].rotation.x = Math.PI / 2
+
+
+        this.redGoalZone = BABYLON.MeshBuilder.CreateBox('redGoalZone', {
+            width: 5, height: this.goalHeight - 3, depth: this.goalWidth - 3
+        })
+        this.redGoalZone.position = new BABYLON.Vector3(this.width / 2 + 2.5, this.goalHeight / 2 - 1, 0)
+
+
+        this.blueGoalZone = BABYLON.MeshBuilder.CreateBox('blueGoalZone', {
+            width: 5, height: this.goalHeight - 3, depth: this.goalWidth - 3
+        })
+        this.blueGoalZone.position = new BABYLON.Vector3(-this.width / 2 - 2.5, this.goalHeight / 2 - 1, 0)
+
+        if(!this.game.options.isServer) {
+            const netMaterial = new BABYLON.StandardMaterial("ball", this.game.scene);
+            netMaterial.useAlphaFromDiffuseTexture = true
+            const texture = new BABYLON.Texture("assets/textures/net2.png", this.game.scene);
+            texture.uScale = 3
+            texture.vScale = 3
+            texture.hasAlpha = true
+            netMaterial.diffuseTexture = texture
+            this.blueGoalZone.material = netMaterial
+            this.redGoalZone.material = netMaterial
+        }
+        
     }
 }

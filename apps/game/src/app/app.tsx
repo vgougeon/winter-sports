@@ -4,6 +4,7 @@ import store from './store/store'
 import { Provider } from 'react-redux'
 import Queue from "./interface/absolute/queue";
 import Performance from "./interface/absolute/performance";
+import Score from "./interface/absolute/score";
 
 export function App() {
   const ref = useRef<HTMLCanvasElement>(null)
@@ -17,6 +18,7 @@ export function App() {
     <Provider store={store}>
       <Queue />
       <Performance />
+      <Score />
       <canvas ref={ ref }></canvas>
     </Provider>
   );
