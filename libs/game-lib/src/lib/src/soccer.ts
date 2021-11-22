@@ -1,8 +1,6 @@
 import { Game } from "../game-lib";
 import * as BABYLON from 'babylonjs';
 import 'babylonjs-loaders';
-import { IPlayerState } from "../interfaces";
-import { Player } from "./player";
 
 export class Soccer {
     game: Game;
@@ -18,8 +16,8 @@ export class Soccer {
     goalWidth = this.depth / 6
     goalHeight = 13
 
-    // ads: BABYLON.VideoTexture;
-    // adsWide: BABYLON.VideoTexture;
+    ads?: BABYLON.VideoTexture;
+    adsWide?: BABYLON.VideoTexture;
 
     players: any[] = []
 
@@ -31,11 +29,27 @@ export class Soccer {
 
     constructor(game: Game) {
         this.game = game
-        if(this.game.gameMode) {
+        if (this.game.gameMode) {
             this.width = this.game.gameMode.fieldWidth!
             this.depth = this.game.gameMode.fieldHeight!
         }
-        
+
+        if (!this.game.options.isServer) {
+            this.ads = new BABYLON.VideoTexture('video', "assets/video/out.mp4", this.game.scene, undefined, undefined, undefined,
+                { autoPlay: false, muted: true, autoUpdateTexture: true, loop: true })
+            this.ads.vScale = 0.6
+            this.ads.vOffset = 0.15
+            this.adsWide = new BABYLON.VideoTexture('video', "assets/video/out.mp4", this.game.scene, undefined, undefined, undefined,
+                { autoPlay: false, muted: true, autoUpdateTexture: true, loop: true })
+            this.adsWide.vScale = 0.6
+            this.adsWide.vOffset = 0.15
+            this.adsWide.uScale = 3
+            this.game.scene.onPointerDown = () => {
+                this.ads!.video.play();
+                this.adsWide!.video.play();
+            };
+        }
+
 
         this.field = this.generateField()
         this.ball = this.generateBall()
@@ -58,8 +72,8 @@ export class Soccer {
             )
         }
 
-        if(this.ball) {
-            if(this.ball.position.y < 0.5) {
+        if (this.ball) {
+            if (this.ball.position.y < 0.5) {
                 this.ball.dispose()
                 this.ball = this.generateBall()
             }
@@ -73,7 +87,7 @@ export class Soccer {
             mass: 1, restitution: 1, friction: 1,
         }, this.game.scene);
 
-        if(!this.game.options.isServer) {
+        if (!this.game.options.isServer) {
             const ballMaterial = new BABYLON.StandardMaterial("ball", this.game.scene);
             const texture = new BABYLON.Texture("assets/textures/amiga.jpg", this.game.scene);
             ballMaterial.ambientTexture = texture
@@ -81,7 +95,7 @@ export class Soccer {
 
             this.game.shadowGenerator.addShadowCaster(ball)
         }
-        
+
         return ball
     }
 
@@ -96,7 +110,7 @@ export class Soccer {
 
         field.receiveShadows = true
 
-        if(!this.game.options.isServer) {
+        if (!this.game.options.isServer) {
             const grass = new BABYLON.StandardMaterial("grass", this.game.scene);
             const texture = new BABYLON.Texture("assets/textures/clay.jpg", this.game.scene);
             texture.uScale = 8
@@ -220,6 +234,24 @@ export class Soccer {
         this.borders[5].physicsImpostor = new BABYLON.PhysicsImpostor(
             this.borders[5], BABYLON.PhysicsImpostor.BoxImpostor, physics
         )
+
+
+        if (!this.game.options.isServer) {
+            const material = new BABYLON.StandardMaterial("ads", this.game.scene);
+            material.diffuseTexture = this.ads!
+            material.roughness = 1;
+
+            const wideMaterial = new BABYLON.StandardMaterial("adsWide", this.game.scene);
+            wideMaterial.diffuseTexture = this.adsWide!
+            wideMaterial.roughness = 1;
+
+            this.borders[5].material = material
+            this.borders[4].material = material
+            this.borders[3].material = material
+            this.borders[2].material = material
+            this.borders[1].material = wideMaterial
+            this.borders[0].material = wideMaterial
+        }
     }
 
     generateGoals() {

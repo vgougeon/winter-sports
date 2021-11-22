@@ -10,7 +10,7 @@ function Performance() {
             <div className={`flex items-center space-x-2 
             ${state.ping < 80 ? 'text-green-400' : state.ping < 120 ? 'text-yellow-400' : 'text-red-500'}`}>
                 <BsBarChartFill size={14} />
-                <span className="text-xs">{state.ping || '/'} ms</span>
+                <span className="text-xs">{state.ping !== null ? state.ping : '/'} ms</span>
             </div>
             <div className={`flex items-center space-x-2 
             ${state.fps > 50 ? 'text-gray-200' : state.ping > 25 ? 'text-yellow-400' : 'text-red-500'}`}>

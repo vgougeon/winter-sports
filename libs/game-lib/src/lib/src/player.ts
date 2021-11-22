@@ -84,7 +84,7 @@ export class Player {
         )
 
         if (!this.game.options.isServer) {
-            const meshes = await BABYLON.SceneLoader.ImportMeshAsync("", "assets/", "character.glb", this.game.scene)
+            const meshes = await BABYLON.SceneLoader.ImportMeshAsync("", "assets/", "boxes.glb", this.game.scene)
             this.animations = meshes.animationGroups
             this.mesh = meshes.meshes[0]
             this.mesh.scaling = new BABYLON.Vector3(1, 1, 1)
@@ -96,9 +96,12 @@ export class Player {
             let color = new BABYLON.Color3(0.2, 0, 0)
             if(this.state.teamId === 1) color = new BABYLON.Color3(0, 0, 0.2)
             const shirt = this.findMaterial('Shirt') as BABYLON.StandardMaterial
-            shirt.emissiveColor = color
-            shirt.specularColor = color
-            shirt.diffuseColor = color
+            if(shirt) {
+                shirt.emissiveColor = color
+                shirt.specularColor = color
+                shirt.diffuseColor = color
+            }
+            
         }
 
         this.createCamera()

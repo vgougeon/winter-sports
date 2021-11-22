@@ -11,7 +11,8 @@ const server = http.createServer(app);
 
 export const io: SocketIO.Server = socketIO(server, {
   path: "/api/socket/",
-  transports: ['websocket', 'polling']
+  transports: ['websocket', 'polling'],
+
   // cors: {
   //   origin: process.env.ORIGIN_URL,
   //   methods: ["GET", "POST", "PUT", "PATCH"],

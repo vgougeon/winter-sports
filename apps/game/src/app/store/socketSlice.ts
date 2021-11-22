@@ -5,7 +5,7 @@ export const socketSlice = createSlice({
   initialState: {
     online: false,
     user: null,
-    ping: 0,
+    ping: null,
     fps: 0,
   },
   reducers: {

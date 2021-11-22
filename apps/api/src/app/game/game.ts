@@ -47,7 +47,6 @@ export class Game {
     }
 
     ping() {
-        console.log(this.players.map(p => p.ping))
         this.lastPing = { time: dayjs(), code: Math.random() }
         for(let player of this.players) player.emit('ping', this.lastPing.code)
     }
