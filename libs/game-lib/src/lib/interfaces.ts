@@ -28,7 +28,7 @@ export interface IGameOptions {
 }
 
 export interface IGameMode {
-    name: 'Soccer' | 'Beach Volley';
+    name: 'Soccer' | 'Beach Volley' | 'Practice';
     fieldWidth?: number;
     fieldHeight?: number;
     time?: number; //seconds

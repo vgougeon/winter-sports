@@ -3,6 +3,7 @@ import Ammo from 'ammo.js'
 import { Soccer } from './src/soccer';
 import { IGameOptions, IGameState, Player } from '..';
 import { IGameMode } from './interfaces';
+import { TitleScreen } from './src/titleScreen';
 
 export class Game {
   canvas?: HTMLCanvasElement
@@ -21,7 +22,7 @@ export class Game {
   playerId: string | null = null
   self?: Player;
 
-  gamepad?: BABYLON.GamepadManager;
+  titleScreen?: TitleScreen;
 
   constructor(engine: BABYLON.Engine, options: IGameOptions = {}) {
     this.engine = engine
@@ -51,11 +52,22 @@ export class Game {
   async init() {
     const ammo = await Ammo()
     this.scene.enablePhysics(new BABYLON.Vector3(0, -40, 0), new BABYLON.AmmoJSPlugin(true, ammo))
+
+    if(!this.options.isServer) {
+      this.startTitleScreen()
+    }
+  }
+
+  async startTitleScreen() {
+    this.titleScreen = new TitleScreen(this)
   }
 
   async startGameMode(gamemode: IGameMode) {    
     switch (gamemode.name) {
       case 'Soccer':
+        this.sport = new Soccer(this);
+        break;
+      case 'Practice':
         this.sport = new Soccer(this);
         break;
     }

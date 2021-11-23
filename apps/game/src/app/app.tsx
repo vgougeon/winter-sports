@@ -5,6 +5,7 @@ import { Provider } from 'react-redux'
 import Queue from "./interface/absolute/queue";
 import Performance from "./interface/absolute/performance";
 import Score from "./interface/absolute/score";
+import TitleScreen from "./interface/pages/title-screen";
 
 export function App() {
   const ref = useRef<HTMLCanvasElement>(null)
@@ -16,6 +17,7 @@ export function App() {
   }, [])
   return (
     <Provider store={store}>
+      <TitleScreen />
       <Queue />
       <Performance />
       <Score />

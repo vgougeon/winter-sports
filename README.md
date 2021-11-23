@@ -28,6 +28,20 @@ This part contains precise indication on how to use the project on a linux envir
     - curl -fsSL https://deb.nodesource.com/setup_17.x | bash -
     - apt-get install -y nodejs
     - npm install pm2 -g
+    - npm install nx -g
+    - create apps.json
+```
+{
+    "apps": [
+        {
+            "name": "api",
+            "cwd": "./winter-sports",
+            "script": "npm",
+            "args" : "run startAPI"
+        }
+    ]
+}
+```
   - ssh-keygen
     - /root/.ssh/id_rsa
     - copy public key
@@ -38,3 +52,5 @@ This part contains precise indication on how to use the project on a linux envir
   - apt-get install webhook
     - webhook is a simple webserver listening to webhooks
   - create hooks.json
+  - apt-get install nginx
+    - 

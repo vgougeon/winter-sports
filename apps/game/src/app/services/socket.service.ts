@@ -36,7 +36,6 @@ export class SocketService {
 
             this.socket.on('g', this.state.bind(this))
             this.socket.on('gInfo', this.gInfo.bind(this))
-            this.queue()
         }
     }
 
@@ -47,7 +46,8 @@ export class SocketService {
     }
 
     queue() {
-        this.socket!.emit('queue')
+        const queue = store.getState().queue.queueState
+        if(!queue) this.socket!.emit('queue')
     }
 
     state(state: IGameState) {
@@ -66,6 +66,14 @@ export class SocketService {
 
     input(inputs: IInputMap) {
         this.socket?.emit('i', inputs)
+    }
+
+    practice() {
+        this.game?.startGameMode({
+            name: 'Practice',
+            fieldHeight: 100,
+            fieldWidth: 160
+        })
     }
 }
 
