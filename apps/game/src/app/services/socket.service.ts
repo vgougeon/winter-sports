@@ -11,7 +11,7 @@ export class SocketService {
     game: GameInstance | null = null;
     localGame: Game | null = null;
     fpsLoopId?: NodeJS.Timeout
-    url = process.env.WEBSOCKET_URL;
+    url = process.env.WEBSOCKET_URL || 'NO_URL';
 
     async init(canvas: HTMLCanvasElement) {
         this.localGame = new Game(canvas)
