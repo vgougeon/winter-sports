@@ -12,16 +12,15 @@ const server = http.createServer(app);
 export const io: SocketIO.Server = socketIO(server, {
   path: "/api/socket/",
   transports: ['websocket', 'polling'],
-
   // cors: {
-  //   origin: process.env.ORIGIN_URL,
+  //   origin: 'http://localhost:4200',
   //   methods: ["GET", "POST", "PUT", "PATCH"],
   //   credentials: true
   // }
 });
 
 app.get('/api', (req, res) => {
-  res.send({ message: 'Welcome to api!' });
+  res.send({ version: process.env.VERSION });
 });
 
 app.use(cookieParser());

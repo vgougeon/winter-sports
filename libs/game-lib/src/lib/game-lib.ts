@@ -4,6 +4,7 @@ import { Soccer } from './src/soccer';
 import { IGameOptions, IGameState, Player } from '..';
 import { IGameMode } from './interfaces';
 import { TitleScreen } from './src/titleScreen';
+import { SoundtrackManager } from './src/soundtrackManager';
 
 export class Game {
   canvas?: HTMLCanvasElement
@@ -13,6 +14,7 @@ export class Game {
   hemisphericLight: BABYLON.HemisphericLight;
   light: BABYLON.DirectionalLight
   shadowGenerator: BABYLON.ShadowGenerator;
+  skybox?: BABYLON.Mesh
 
   gameMode: IGameMode | null = null
   sport: Soccer | null = null;
@@ -23,6 +25,7 @@ export class Game {
   self?: Player;
 
   titleScreen?: TitleScreen;
+  soundtrackManager: SoundtrackManager;
 
   constructor(engine: BABYLON.Engine, options: IGameOptions = {}) {
     this.engine = engine
@@ -41,6 +44,8 @@ export class Game {
     this.light.intensity = 1
     this.light.position = new BABYLON.Vector3(20, 40, 20);
     this.shadowGenerator = new BABYLON.ShadowGenerator(1024, this.light)
+
+    this.soundtrackManager = new SoundtrackManager(this)
 
     if (!this.options.isServer) this.generateSkybox()
 
@@ -74,14 +79,14 @@ export class Game {
   }
 
   generateSkybox() {
-    const skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 750 }, this.scene);
+    this.skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 750 }, this.scene);
     const skyboxMaterial = new BABYLON.StandardMaterial("skyBox", this.scene);
     skyboxMaterial.backFaceCulling = false;
     skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("assets/skybox/sunny", this.scene);
     skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
     skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
     skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-    skybox.material = skyboxMaterial;
+    this.skybox.material = skyboxMaterial;
   }
 
   followPlayer(player: Player) {

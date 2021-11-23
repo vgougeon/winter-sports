@@ -1,6 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "types": ["babylonjs", "babylonjs-materials"],
     "rootDir": ".",
     "sourceMap": true,
     "declaration": false,
