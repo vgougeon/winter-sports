@@ -2,7 +2,7 @@ import { Game } from "../game-lib";
 import * as BABYLON from 'babylonjs';
 import 'babylonjs-loaders';
 import { IPlayerState } from "../interfaces";
-import { IInputMap } from '@winter-sports/game-lib';
+import { IInputMap, Soccer } from '@winter-sports/game-lib';
 
 export class Player {
     game: Game;
@@ -23,17 +23,20 @@ export class Player {
 
     animations: BABYLON.AnimationGroup[] = []
 
+    loopCall = this.loop.bind(this)
+
     constructor(game: Game, state: IPlayerState) {
         this.game = game
         this.state = state
         if (this.state.id === this.game.playerId) this.game.setSelf(this)
 
-        this.game.scene.registerBeforeRender(this.loop.bind(this))
+        this.game.scene.registerBeforeRender(this.loopCall)
 
         this.init()
     }
 
     loop() {
+        if(!this.game.options.isServer && this.state.id === 'self') this.currentInputs = this.game.currentInputs
         this.acceleration = new BABYLON.Vector3(
             (this.currentInputs['DOWN'] || 0) * -1 + (this.currentInputs['UP'] || 0), 0,
             (this.currentInputs['RIGHT'] || 0) * -1 + (this.currentInputs['LEFT'] || 0)
@@ -47,12 +50,12 @@ export class Player {
         if (this.collider) this.collider.moveWithCollisions(this.velocity)
         this.velocity = this.velocity.scaleInPlace(0.8)
 
-        if(!this.game.options.isServer) this.animate()
+        if (!this.game.options.isServer) this.animate()
     }
 
     animate() {
-        if(this.animations[2]) {
-            if(Math.abs(this.velocity.length()) > 0.05) {
+        if (this.animations[2]) {
+            if (Math.abs(this.velocity.length()) > 0.05) {
                 this.animations[2].speedRatio = (Math.abs(this.velocity.length())) * 5
                 this.animations[2].play(true)
             }
@@ -61,15 +64,18 @@ export class Player {
     }
 
     getKickoffPosition() {
-        const mates = this.game.players.filter(p => p.state.teamId === this.state.teamId)
-        let m = this.state.teamId === 0 ? 1 : -1
-        let width = this.game.sport?.width || 30
-        let depth = this.game.sport?.depth || 20
-        return new BABYLON.Vector3(
-            mates.length < 1 ? width / 4 * m : width / 3 * m, 
-            this.height / 2, 
-            mates.length < 1 ? 0 : mates.length === 1 ? depth / 4 : -depth / 4
-        )
+        if (this.game.mode instanceof Soccer) {
+            const mates = this.game.players.filter(p => p.state.teamId === this.state.teamId)
+            let m = this.state.teamId === 0 ? 1 : -1
+            let width = this.game.mode?.width || 30
+            let depth = this.game.mode?.depth || 20
+            return new BABYLON.Vector3(
+                mates.length < 1 ? width / 4 * m : width / 3 * m,
+                this.height / 2,
+                mates.length < 1 ? 0 : mates.length === 1 ? depth / 4 : -depth / 4
+            )
+        }
+        return new BABYLON.Vector3(0, 0, 0)
     }
 
     async init() {
@@ -89,19 +95,19 @@ export class Player {
             this.mesh = meshes.meshes[0]
             this.mesh.scaling = new BABYLON.Vector3(1, 1, 1)
             this.mesh.position = this.collider.position
-            
-            this.mesh.setParent(this.collider)
-            this.mesh.setPositionWithLocalVector(new BABYLON.Vector3(0, -this.height/2, 0))
+
+            this.mesh.parent = this.collider
+            this.mesh.setPositionWithLocalVector(new BABYLON.Vector3(0, -this.height / 2, 0))
             this.game.shadowGenerator.addShadowCaster(this.collider)
             let color = new BABYLON.Color3(0.2, 0, 0)
-            if(this.state.teamId === 1) color = new BABYLON.Color3(0, 0, 0.2)
+            if (this.state.teamId === 1) color = new BABYLON.Color3(0, 0, 0.2)
             const shirt = this.findMaterial('Shirt') as BABYLON.StandardMaterial
-            if(shirt) {
+            if (shirt) {
                 shirt.emissiveColor = color
                 shirt.specularColor = color
                 shirt.diffuseColor = color
             }
-            
+
         }
 
         this.createCamera()
@@ -131,5 +137,12 @@ export class Player {
         }
     }
 
+
+    destroy() {
+        this.collider?.dispose()
+        this.mesh?.dispose()
+        this.camera?.dispose()
+        this.game.scene.unregisterBeforeRender(this.loopCall)
+    }
 
 }

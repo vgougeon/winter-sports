@@ -1,11 +1,36 @@
 import { Game } from "../game-lib";
 import * as BABYLON from 'babylonjs';
 import 'babylonjs-loaders';
+import { Player } from '@winter-sports/game-lib';
 
 export class Soccer {
     game: Game;
     ball: BABYLON.Mesh;
     field: BABYLON.Mesh;
+    ads?: BABYLON.VideoTexture;
+    adsWide?: BABYLON.VideoTexture;
+    lines: BABYLON.Mesh[] = []
+    borders: BABYLON.Mesh[] = []
+    redGoal: BABYLON.Mesh[] = []
+    blueGoal: BABYLON.Mesh[] = []
+    redGoalZone?: BABYLON.Mesh
+    blueGoalZone?: BABYLON.Mesh
+
+    loopCall = this.loop.bind(this)
+
+    destroy() {
+        this.game.scene.unregisterBeforeRender(this.loopCall)
+        this.ball.dispose()
+        this.field.dispose()
+        this.ads?.dispose()
+        this.adsWide?.dispose()
+        this.lines.map(line => line.dispose())
+        this.borders.map(border => border.dispose())
+        this.redGoal.map(redGoal => redGoal.dispose())
+        this.blueGoal.map(blueGoal => blueGoal.dispose())
+        this.blueGoalZone?.dispose()
+        this.redGoalZone?.dispose()
+    }
 
     width = 200
     depth = 130
@@ -15,20 +40,6 @@ export class Soccer {
     borderThickness = 1
     goalWidth = this.depth / 6
     goalHeight = 13
-
-    ads?: BABYLON.VideoTexture;
-    adsWide?: BABYLON.VideoTexture;
-
-    players: any[] = []
-
-    lines: BABYLON.Mesh[] = []
-    borders: BABYLON.Mesh[] = []
-
-    redGoal: BABYLON.Mesh[] = []
-    blueGoal: BABYLON.Mesh[] = []
-
-    redGoalZone?: BABYLON.Mesh
-    blueGoalZone?: BABYLON.Mesh
 
     subscriptions: {
         [key: string]: Function
@@ -57,17 +68,21 @@ export class Soccer {
             };
         }
 
-
         this.generateGoals()
         this.ball = this.generateBall()
 
         this.field = this.generateField()
         this.generateBorders()
 
+        game.scene.registerBeforeRender(this.loopCall)
+    }
 
-
-
-        game.scene.registerBeforeRender(this.loop.bind(this))
+    init() {
+        if(this.game.gameMode?.name === 'Practice') {
+            const player = new Player(this.game, { 
+                id: 'self', name: '', teamId: Math.floor(Math.random()*2) })
+            this.game.players.push(player)
+        }
     }
 
     loop() {
@@ -331,4 +346,6 @@ export class Soccer {
         }
         
     }
+
+    
 }

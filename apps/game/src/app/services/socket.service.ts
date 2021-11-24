@@ -1,11 +1,11 @@
-import { IGameMode, IGameState, IGInfo, IInputMap } from "@winter-sports/game-lib";
+import { IGameState, IGInfo, IInputMap } from "@winter-sports/game-lib";
 import { io, Socket } from "socket.io-client";
 import { Game as GameInstance } from '@winter-sports/game-lib'
 import { Game } from './../game/game';
 import { resetSocket, setError, setFPS, setOnline, setPing } from "../store/socketSlice";
 import store from "../store/store";
 import { setQueue } from "../store/queueSlice";
-import { setTeam1, setTeam2, setTimer } from "../store/gameSlice";
+import { setMode, setTeam1, setTeam2, setTimer } from "../store/gameSlice";
 
 export class SocketService {
     socket: Socket | null = null;
@@ -16,7 +16,6 @@ export class SocketService {
     url = process.env.NX_WEBSOCKET_URL || 'NO_URL';
 
     async init(canvas: HTMLCanvasElement) {
-        console.log("ENV : ", process.env)
         this.localGame = new Game(canvas)
         this.game = this.localGame.game
         await this.game.init()
@@ -56,6 +55,7 @@ export class SocketService {
 
     gInfo(gInfo: IGInfo) {
         store.dispatch(setQueue(null))
+        store.dispatch(setMode(gInfo.gameMode.name))
         if (this.game) this.game.startGameMode(gInfo.gameMode)
         if (this.game) this.game.playerId = gInfo.playerId
     }
@@ -84,6 +84,7 @@ export class SocketService {
     }
 
     practice() {
+        store.dispatch(setMode('Practice'))
         this.game?.startGameMode({
             name: 'Practice',
             fieldHeight: 100,

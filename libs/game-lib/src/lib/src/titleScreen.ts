@@ -1,5 +1,6 @@
 import { Game } from './../game-lib';
 import * as BABYLON from 'babylonjs'
+import { Player } from './player';
 
 export class TitleScreen {
     game: Game;
@@ -7,7 +8,6 @@ export class TitleScreen {
     characterSupport?: BABYLON.Mesh;
     support?: BABYLON.Mesh;
     character?: BABYLON.AbstractMesh;
-
     decorations: BABYLON.AbstractMesh[] = []
 
     constructor(game: Game) {
@@ -48,8 +48,13 @@ export class TitleScreen {
 
 
         this.game.soundtrackManager.playTitleScreen()
+    }
 
-        this.init()
+    destroy() {        
+        this.character?.dispose()
+        this.characterSupport?.dispose()
+        this.support?.dispose()
+        this.decorations.map(d => d.dispose())
     }
 
     async init() {
@@ -66,20 +71,16 @@ export class TitleScreen {
         // water.addToRenderList(this.game.skybox);
         // waterMesh.material = water as any;
 
-        const meshes = await BABYLON.SceneLoader.ImportMeshAsync("", "assets/", "boxes.glb", this.game.scene)
+        const meshes = await BABYLON.SceneLoader.ImportMeshAsync("", "assets/", "boxes.glb")
         this.character = meshes.meshes[0]
         this.character.scaling = new BABYLON.Vector3(.3, .3, .3)
         this.game.shadowGenerator.addShadowCaster(this.character)
 
-        const tree = await BABYLON.SceneLoader.ImportMeshAsync("", "assets/objects/", "tree.glb", this.game.scene)
+        const tree = await BABYLON.SceneLoader.ImportMeshAsync("", "assets/objects/", "tree.glb")
         this.addMesh(tree, new BABYLON.Vector3(-2, -0.1, 2), 0.3)
 
-        const chair = await BABYLON.SceneLoader.ImportMeshAsync("", "assets/objects/", "chair.glb", this.game.scene)
+        const chair = await BABYLON.SceneLoader.ImportMeshAsync("", "assets/objects/", "chair.glb")
         this.addMesh(chair, new BABYLON.Vector3(-2.7, 0, 0.4), 0.25, Math.PI)
-
-        
-
-
     }
 
     async addMesh(loaded: BABYLON.ISceneLoaderAsyncResult, position: BABYLON.Vector3, scale = 0.3, yRotate = 0) {
