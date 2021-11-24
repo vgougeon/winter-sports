@@ -36,10 +36,13 @@ export class Player {
     }
 
     loop() {
-        if(!this.game.options.isServer && this.state.id === 'self') this.currentInputs = this.game.currentInputs
+        if (!this.game.options.isServer && this.state.id === 'self') this.currentInputs = this.game.currentInputs
+
+        let m = this.state.teamId === 0 ? 1 : -1
+
         this.acceleration = new BABYLON.Vector3(
-            (this.currentInputs['DOWN'] || 0) * -1 + (this.currentInputs['UP'] || 0), 0,
-            (this.currentInputs['RIGHT'] || 0) * -1 + (this.currentInputs['LEFT'] || 0)
+            (this.currentInputs['DOWN'] || 0) * -1 * m + (this.currentInputs['UP'] || 0) * m, 0,
+            (this.currentInputs['RIGHT'] || 0) * -1 * m + (this.currentInputs['LEFT'] || 0) * m
         )
         if (Math.abs(this.acceleration.x) + Math.abs(this.acceleration.z) === 2) {
             this.acceleration = this.acceleration.scaleInPlace(this.speed / Math.sqrt(2))
@@ -49,6 +52,12 @@ export class Player {
         if (!this.velocity.equals(new BABYLON.Vector3(0, 0, 0))) this.collider?.lookAt(this.collider.position.subtract(this.velocity))
         if (this.collider) this.collider.moveWithCollisions(this.velocity)
         this.velocity = this.velocity.scaleInPlace(0.8)
+
+        if(this.camera && this.collider) {
+            this.camera.position.x = this.collider.position.x - this.cameraDistance * m
+            this.camera.position.z = this.collider.position.z
+        }
+
 
         if (!this.game.options.isServer) this.animate()
     }
@@ -66,7 +75,7 @@ export class Player {
     getKickoffPosition() {
         if (this.game.mode instanceof Soccer) {
             const mates = this.game.players.filter(p => p.state.teamId === this.state.teamId)
-            let m = this.state.teamId === 0 ? 1 : -1
+            let m = this.state.teamId === 0 ? -1 : 1
             let width = this.game.mode?.width || 30
             let depth = this.game.mode?.depth || 20
             return new BABYLON.Vector3(
@@ -126,12 +135,11 @@ export class Player {
         this.camera = new BABYLON.FreeCamera('player_camera', new BABYLON.Vector3(-this.cameraDistance, this.cameraHeight, 0), this.game.scene)
         this.camera.lockedTarget = this.collider
         this.camera.fov = 0.8
-        this.game.scene.registerBeforeRender(() => {
-            if (this.camera && this.collider) {
-                this.camera.position.x = this.collider.position.x - this.cameraDistance
-                this.camera.position.z = this.collider.position.z
-            }
-        })
+        let m = this.state.teamId === 0 ? 1 : -1
+        if (this.camera && this.collider) {
+            this.camera.position.x = this.collider.position.x - this.cameraDistance * m
+            this.camera.position.z = this.collider.position.z
+        }
         if (this.game.playerId === this.state.id) {
             this.game.followPlayer(this)
         }
