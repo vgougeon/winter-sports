@@ -72,7 +72,7 @@ function getWebpackConfig(config) {
         config.plugins.push(new ReactRefreshPlugin());
     }
     console.log("customize webpack cnfig")
-    config.externals = { fs: 'empty', path: 'empty'}
+    config.externals = { fs: 'empty', path: 'empty', "ammo.js": "Ammo" }
     return config;
 }
 module.exports = getWebpackConfig;

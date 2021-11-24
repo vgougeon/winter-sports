@@ -27,7 +27,7 @@ function TitleScreen() {
                 Could not connect to the web socket server.<br />
                 <span className="text-sm font-light">Server might be offline, try again later</span>
                 <button className="h-10 px-5 ml-24 font-normal text-white rounded filter drop-shadow-lg hover:bg-gray-700 active:bg-gray-900"
-                onClick={() => { const url = prompt('Custom web socket URL'); if(url) socketService.connectTo(url) }}>
+                onClick={() => { const url = prompt('Custom web socket URL'); if(url) socketService.connectTo(url); }}>
                     Custom WEBSOCKET
                 </button>
             </div> }

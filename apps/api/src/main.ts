@@ -20,7 +20,7 @@ export const io: SocketIO.Server = socketIO(server, {
 });
 
 app.get('/api', (req, res) => {
-  res.send({ version: process.env.VERSION });
+  res.send({ version: process.env.NX_VERSION });
 });
 
 app.use(cookieParser());

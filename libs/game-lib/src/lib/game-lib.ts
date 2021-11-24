@@ -1,5 +1,5 @@
 import * as BABYLON from 'babylonjs';
-import Ammo from 'ammo.js'
+import Ammo from 'ammo.js';
 import { Soccer } from './src/soccer';
 import { IGameOptions, IGameState, Player } from '..';
 import { IGameMode } from './interfaces';

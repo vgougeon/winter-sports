@@ -6,14 +6,17 @@ import { resetSocket, setError, setFPS, setOnline, setPing } from "../store/sock
 import store from "../store/store";
 import { setQueue } from "../store/queueSlice";
 import { setTeam1, setTeam2, setTimer } from "../store/gameSlice";
+
 export class SocketService {
     socket: Socket | null = null;
     game: GameInstance | null = null;
     localGame: Game | null = null;
     fpsLoopId?: NodeJS.Timeout
-    url = process.env.WEBSOCKET_URL || 'NO_URL';
+    
+    url = process.env.NX_WEBSOCKET_URL || 'NO_URL';
 
     async init(canvas: HTMLCanvasElement) {
+        console.log("ENV : ", process.env)
         this.localGame = new Game(canvas)
         this.game = this.localGame.game
         await this.game.init()
