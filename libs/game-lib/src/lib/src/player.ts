@@ -44,6 +44,7 @@ export class Player {
             (this.currentInputs['DOWN'] || 0) * -1 * m + (this.currentInputs['UP'] || 0) * m, 0,
             (this.currentInputs['RIGHT'] || 0) * -1 * m + (this.currentInputs['LEFT'] || 0) * m
         )
+        //TODO: keep acceleration on frame drop
         if (Math.abs(this.acceleration.x) + Math.abs(this.acceleration.z) === 2) {
             this.acceleration = this.acceleration.scaleInPlace(this.speed / Math.sqrt(2))
         }

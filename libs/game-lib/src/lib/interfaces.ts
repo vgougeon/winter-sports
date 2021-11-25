@@ -11,6 +11,7 @@ export interface IGameState {
         score: number;
     }[],
     timer: string;
+    delta: number;
 }
 
 export interface IPlayerState {

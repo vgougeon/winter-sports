@@ -1,6 +1,6 @@
 import { PlayerSocket } from '../../types/player-socket.interface';
 import * as BABYLON from 'babylonjs';
-import { Game as GameInstance, TICK_RATE, Player, IGameMode, IGInfo, IInputMap, Soccer } from '@winter-sports/game-lib';
+import { Game as GameInstance, TICK_RATE, Player, IGameMode, IGInfo, IInputMap, Soccer, IGameState } from '@winter-sports/game-lib';
 import dayjs, { Dayjs } from 'dayjs';
 import duration from 'dayjs/plugin/duration'
 dayjs.extend(duration)
@@ -10,6 +10,7 @@ export class Game {
     loopIntervalId: NodeJS.Timeout
     pingIntervalId: NodeJS.Timeout
     tickRate = TICK_RATE
+    deltaTime: number;
     players: PlayerSocket[]
 
     gameMode: IGameMode = {
@@ -23,7 +24,8 @@ export class Game {
 
     lastPing = { time: dayjs(), code: Math.random() }
 
-    gameState: any = {}
+    gameState: any; // TODO: change to IGameState
+    loopId?: () => void;
 
     constructor(players?: PlayerSocket[]) {
         this.players = players
@@ -52,7 +54,7 @@ export class Game {
         for (let player of this.players) this.initPlayer(player)
         this.initialGameState()
 
-        this.loopIntervalId = setInterval(this.loop.bind(this), 1000 / this.tickRate)
+        this.game.scene.registerAfterRender(() => this.loop())
         this.pingIntervalId = setInterval(this.ping.bind(this), 2000)
     }
 
@@ -84,7 +86,8 @@ export class Game {
             const ball = this.game.mode.ball
             const ballAngularVelocity = ball.physicsImpostor.getAngularVelocity()
             const ballLinearVelocity = ball.physicsImpostor.getLinearVelocity()
-
+            
+            this.gameState.delta = this.deltaTime
             this.gameState.timer = dayjs.duration(this.gameStartAt.add(5, 'minutes').diff(dayjs())).format('m:ss')
             this.gameState.ball = {
                 position: {
@@ -154,6 +157,7 @@ export class Game {
     }
 
     loop() {
+        this.deltaTime = this.engine.getDeltaTime()
         this.updateGameState()
         if (this.game.mode) {
             for (let player of this.players) {
