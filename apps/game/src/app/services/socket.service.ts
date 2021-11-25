@@ -1,4 +1,4 @@
-import { IGameState, IGInfo, IInputMap } from "@winter-sports/game-lib";
+import { IGameState, IGInfo, IInputMap, IQueueState } from "@winter-sports/game-lib";
 import { io, Socket } from "socket.io-client";
 import { Game as GameInstance } from '@winter-sports/game-lib'
 import { Game } from './../game/game';
@@ -37,9 +37,9 @@ export class SocketService {
             })
             this.socket.on('connect', () => store.dispatch(setOnline()))
 
-            this.socket.on('queueState', (data) => store.dispatch(setQueue(data)))
+            this.socket.on('queueState', (data: IQueueState) => store.dispatch(setQueue(data)))
 
-            this.socket.on('ping', (code) => this.socket?.emit('ping', code))
+            this.socket.on('ping', (code: number) => this.socket?.emit('ping', code))
 
             this.socket.on('g', this.state.bind(this))
             this.socket.on('gInfo', this.gInfo.bind(this))

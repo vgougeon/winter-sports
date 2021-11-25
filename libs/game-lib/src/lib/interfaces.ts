@@ -42,3 +42,8 @@ export interface IGInfo {
 export interface IInputMap {
     [key: string]: number;
 }
+
+export interface IQueueState {
+    position: number;
+    inQueue: number;
+}
