@@ -12,11 +12,6 @@ const server = http.createServer(app);
 export const io: SocketIO.Server = socketIO(server, {
   path: "/api/socket/",
   transports: ['websocket', 'polling'],
-  // cors: {
-  //   origin: 'http://localhost:4200',
-  //   methods: ["GET", "POST", "PUT", "PATCH"],
-  //   credentials: true
-  // }
 });
 
 app.get('/api', (req, res) => {

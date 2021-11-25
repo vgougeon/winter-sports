@@ -130,6 +130,7 @@ export class Game {
         currentPlayer.velocity.x = player.velocity!.x
         currentPlayer.velocity.y = player.velocity!.y
         currentPlayer.velocity.z = player.velocity!.z
+        currentPlayer.state.ping = player.ping
       }
       else { this.players.push(new Player(this, player)) }
     }

@@ -2,7 +2,7 @@ import { IGameState, IGInfo, IInputMap, IQueueState } from "@winter-sports/game-
 import { io, Socket } from "socket.io-client";
 import { Game as GameInstance } from '@winter-sports/game-lib'
 import { Game } from './../game/game';
-import { resetSocket, setError, setFPS, setOnline, setPing } from "../store/socketSlice";
+import { resetSocket, setAverageDelta, setError, setFPS, setOnline, setPing } from "../store/socketSlice";
 import store from "../store/store";
 import { setQueue } from "../store/queueSlice";
 import { setMode, setTeam1, setTeam2, setTimer } from "../store/gameSlice";
@@ -12,6 +12,8 @@ export class SocketService {
     game: GameInstance | null = null;
     localGame: Game | null = null;
     fpsLoopId?: NodeJS.Timeout
+
+    deltaTime: number[] = [] // X last values of Delta Time
     
     url = process.env.NX_WEBSOCKET_URL || 'NO_URL';
 
@@ -67,16 +69,22 @@ export class SocketService {
 
     state(state: IGameState) {
         const uiState = store.getState()
-        this.game?.updateGame(state)
+        this.deltaTime.push(state.delta)
 
-        if (uiState.game.timer !== state.timer) store.dispatch(setTimer(state.timer))
-        if (uiState.game.team1 !== state.teams[0].score) store.dispatch(setTeam1(state.teams[0].score))
-        if (uiState.game.team2 !== state.teams[1].score) store.dispatch(setTeam2(state.teams[1].score))
         const self = this.game?.players.find(p => p.state.id === this.game?.playerId)
         const selfNew = state.players.find(p => p.id === this.game?.playerId)
         if (self && self.state.ping !== selfNew?.ping) {
+            store.dispatch(setAverageDelta(Math.round(this.deltaTime.reduce((t, n) => t + n, 0) / this.deltaTime.length)))
             store.dispatch(setPing(selfNew?.ping))
+            this.deltaTime = []
         }
+
+        this.game?.updateGame(state)
+        
+        if (uiState.game.timer !== state.timer) store.dispatch(setTimer(state.timer))
+        if (uiState.game.team1 !== state.teams[0].score) store.dispatch(setTeam1(state.teams[0].score))
+        if (uiState.game.team2 !== state.teams[1].score) store.dispatch(setTeam2(state.teams[1].score))
+        
     }
 
     input(inputs: IInputMap) {

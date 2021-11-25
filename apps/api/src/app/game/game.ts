@@ -158,6 +158,7 @@ export class Game {
 
     loop() {
         this.deltaTime = this.engine.getDeltaTime()
+        console.log(this.deltaTime)
         this.updateGameState()
         if (this.game.mode) {
             for (let player of this.players) {

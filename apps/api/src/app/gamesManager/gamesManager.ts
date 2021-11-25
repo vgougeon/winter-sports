@@ -4,7 +4,8 @@ import { Game } from '../game/game';
 class GamesManager {
     games: Game[] = []
     constructor() {
-
+        console.log("Game manager ON")
+        this.games.push(new Game([]))
     }
 
     createGame(players: PlayerSocket[]) {

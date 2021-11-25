@@ -4,7 +4,7 @@ import { PlayerSocket } from './../../types/player-socket.interface';
 class Queue {
     players: PlayerSocket[] = []
     loopIntervalId: NodeJS.Timeout
-    playersPerGame = 2
+    playersPerGame = 1
 
     constructor() {
         this.loopIntervalId = setInterval(() => {
