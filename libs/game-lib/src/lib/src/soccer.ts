@@ -36,11 +36,12 @@ export class Soccer {
     depth = 130
     lineThickness = 1
     center = new BABYLON.Vector3(0, 0, 0)
-    borderHeight = 5
-    borderThickness = 1
+    
+    
     goalWidth = this.depth / 6
     goalHeight = 13
-
+    borderHeight = this.goalHeight
+    borderThickness = 3
     subscriptions: {
         [key: string]: Function
     } = {}
@@ -48,8 +49,8 @@ export class Soccer {
     constructor(game: Game) {
         this.game = game
         if (this.game.gameMode) {
-            this.width = this.game.gameMode.fieldWidth!
-            this.depth = this.game.gameMode.fieldHeight!
+            this.width = this.game.gameMode.fieldWidth || this.width
+            this.depth = this.game.gameMode.fieldHeight || this.depth            
         }
 
         if (!this.game.options.isServer) {
@@ -142,6 +143,7 @@ export class Soccer {
     }
 
     generateField(): BABYLON.Mesh {
+        debugger
         const field = BABYLON.MeshBuilder.CreateBox('field', { width: this.width, height: 1, depth: this.depth })
         field.position.y = -0.51
         field.physicsImpostor = new BABYLON.PhysicsImpostor(field, BABYLON.PhysicsImpostor.BoxImpostor, {
@@ -279,13 +281,30 @@ export class Soccer {
 
 
         if (!this.game.options.isServer) {
-            const material = new BABYLON.StandardMaterial("ads", this.game.scene);
-            material.diffuseTexture = this.ads!
-            material.roughness = 1;
+            // const material = new BABYLON.StandardMaterial("ads", this.game.scene);
+            // material.diffuseTexture = this.ads!
+            // material.roughness = 1;
 
-            const wideMaterial = new BABYLON.StandardMaterial("adsWide", this.game.scene);
-            wideMaterial.diffuseTexture = this.adsWide!
-            wideMaterial.roughness = 1;
+            // const wideMaterial = new BABYLON.StandardMaterial("adsWide", this.game.scene);
+            // wideMaterial.diffuseTexture = this.adsWide!
+            // wideMaterial.roughness = 1;
+
+            const texture = new BABYLON.Texture('assets/textures/borders.png', this.game.scene)
+            const wideTexture = new BABYLON.Texture('assets/textures/borders.png', this.game.scene)
+            const material = new BABYLON.StandardMaterial("borders", this.game.scene)
+            const wideMaterial = new BABYLON.StandardMaterial("wideBorders", this.game.scene)
+            texture.hasAlpha = true
+            wideTexture.hasAlpha = true
+            texture.uScale = 4
+            texture.vScale = 2
+            wideTexture.uScale = 16
+            wideTexture.vScale = 2
+            material.diffuseTexture = texture
+            wideMaterial.diffuseTexture = wideTexture
+            material.useAlphaFromDiffuseTexture = true
+            wideMaterial.useAlphaFromDiffuseTexture = true
+            material.alpha = 0.5
+            wideMaterial.alpha = 0.5
 
             this.borders[5].material = material
             this.borders[4].material = material
@@ -341,6 +360,7 @@ export class Soccer {
             texture.vScale = 3
             texture.hasAlpha = true
             netMaterial.diffuseTexture = texture
+            netMaterial.alpha = 0.5
             this.blueGoalZone.material = netMaterial
             this.redGoalZone.material = netMaterial
         }

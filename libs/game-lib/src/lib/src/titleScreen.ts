@@ -71,7 +71,7 @@ export class TitleScreen {
         // water.addToRenderList(this.game.skybox);
         // waterMesh.material = water as any;
 
-        const meshes = await BABYLON.SceneLoader.ImportMeshAsync("", "assets/", "boxes.glb")
+        const meshes = await BABYLON.SceneLoader.ImportMeshAsync("", "assets/", "sackboy.glb")
         this.character = meshes.meshes[0]
         this.character.scaling = new BABYLON.Vector3(.3, .3, .3)
         this.game.shadowGenerator.addShadowCaster(this.character)

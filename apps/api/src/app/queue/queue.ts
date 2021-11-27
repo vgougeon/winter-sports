@@ -22,7 +22,6 @@ class Queue {
                 for(let p of game.players) {
                     this.removePlayer(p)
                 }
-                console.log(this.players)
             }
         }
     }

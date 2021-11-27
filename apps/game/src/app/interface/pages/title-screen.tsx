@@ -3,7 +3,7 @@ import { BiLoaderAlt } from 'react-icons/bi';
 import { TiCancel } from 'react-icons/ti';
 import { GiStaticGuard } from 'react-icons/gi';
 import { RiSettings3Fill } from 'react-icons/ri';
-import { BsConeStriped } from 'react-icons/bs'
+import { BsConeStriped, BsFillBookmarkCheckFill, BsBookmark } from 'react-icons/bs'
 import { BiWorld } from 'react-icons/bi';
 import socketService from '../../services/socket.service';
 import { useSelector } from 'react-redux';
@@ -15,8 +15,8 @@ function TitleScreen() {
     const socket = useSelector((state: any) => state.socket)
     const [gameModes, setGameModes] = useState([4])
     const toggle = (gameMode: number) => {
-        if(queueState) socketService.leaveQueue()
-        if(gameModes.includes(gameMode)) setGameModes(gameModes.filter(v => v !== gameMode))
+        if (queueState) socketService.leaveQueue()
+        if (gameModes.includes(gameMode)) setGameModes(gameModes.filter(v => v !== gameMode))
         else setGameModes([...gameModes, gameMode])
     }
     return (
@@ -42,21 +42,27 @@ function TitleScreen() {
                     </button>
                 </div>}
                 <div
-                className="flex items-center py-4 space-x-2">
-                    <Button action={() => socketService.queue(gameModes)}>
-                        {!queueState ?
-                            <FaVolleyballBall className='inline mr-4' />
-                            : <BiLoaderAlt className='inline mr-4 rotate' />}
-                        Quick Play
-                    </Button>
-                    <Toggle players={ queueState?.inQueue1v1}
-                    active={gameModes.includes(2)} action={() => toggle(2)}>1v1</Toggle>
-                    <Toggle players={ queueState?.inQueue2v2}
-                    active={gameModes.includes(4)} action={() => toggle(4)}>2v2</Toggle>
-                    <Toggle players={ queueState?.inQueue3v3}
-                    active={gameModes.includes(6)} action={() => toggle(6)}>3v3</Toggle>
-                    { queueState && <TiCancel className="text-4xl text-white cursor-pointer" onClick={() => socketService.leaveQueue()} /> }
+                    className="flex items-center py-0 ml-24 space-x-2">
+                    <GameMode players={queueState?.inQueue1v1} background="bg-white"
+                        active={gameModes.includes(2)} action={() => toggle(2)}>
+                        1<span className="mx-1 text-sm">vs</span>1
+                    </GameMode>
+                    <GameMode players={queueState?.inQueue2v2} background="bg-white"
+                        active={gameModes.includes(4)} action={() => toggle(4)}>
+                        2<span className="mx-1 text-sm">vs</span>2
+                    </GameMode>
+                    <GameMode players={queueState?.inQueue3v3} background="bg-white"
+                        active={gameModes.includes(6)} action={() => toggle(6)}>
+                        3<span className="mx-1 text-sm">vs</span>3
+                    </GameMode>
+                    {queueState && <TiCancel className="text-4xl text-white cursor-pointer" onClick={() => socketService.leaveQueue()} />}
                 </div>
+                <Button action={() => socketService.queue(gameModes)}>
+                    {!queueState ?
+                        <FaVolleyballBall className='inline mr-4' />
+                        : <BiLoaderAlt className='inline mr-4 rotate' />}
+                    Quick Play
+                </Button>
                 <Button action={() => socketService.practice()}>
                     <BsConeStriped className='inline mr-4' />
                     Practice
@@ -78,20 +84,22 @@ function Button({ name, action, active, children }: any) {
     return (
         <button onClick={action}
             data-active={active}
-            className="px-5 ml-24 text-2xl font-normal text-white rounded h-14 filter drop-shadow-lg hover:bg-gray-700 active:bg-gray-900">
+            className="px-5 ml-24 text-2xl font-normal text-white rounded h-14 filter drop-shadow-lg hover:bg-white active:bg-white hover:text-black">
             {children}
         </button>
     )
 }
 
-function Toggle({ name, action, active, children, players }: any) {
+function GameMode({ name, action, active, children, players, background }: any) {
     return (
         <button onClick={action}
             data-active={active}
-            className="w-20 h-8 px-5 text-sm rounded text-md filter drop-shadow-lg hover:bg-gray-700 active:bg-gray-900">
+            className={`w-48 transition-all text-3xl opacity-50 bg-opacity-50 border-2 border-white text-black border-opacity-50 rounded h-20 backdrop-filter backdrop-blur hover:bg-opacity-75 ${background}`}>
+            {active ? <BsFillBookmarkCheckFill className="absolute left-0 text-4xl text-green-500 -top-2" /> :
+                <BsBookmark className="absolute left-0 text-4xl text-white -top-1" />}
             {children}
-            { players !== undefined && 
-            <span className='absolute left-0 right-0 text-xs text-white -top-5'><BiWorld className='inline mr-2' size={15}/>{ players }</span> 
+            {players !== undefined &&
+                <span className='absolute left-0 right-0 my-auto text-xs text-black opacity-50 bottom-2'>{players} in queue</span>
             }
         </button>
     )

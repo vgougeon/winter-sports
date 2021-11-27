@@ -35,5 +35,5 @@ canvas {
 }
 
 [data-active=true] {
-    @apply bg-indigo-700 bg-opacity-50 backdrop-filter backdrop-blur shadow;
+    @apply border-opacity-100 hover:bg-opacity-100 bg-opacity-100 opacity-100 shadow;
 }

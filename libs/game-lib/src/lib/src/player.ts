@@ -16,6 +16,8 @@ export class Player {
     cameraHeight = 20
     cameraDistance = 40
 
+    stamina = 100
+
     currentInputs: IInputMap = {};
 
     acceleration = new BABYLON.Vector3(0, 0, 0)
@@ -59,6 +61,19 @@ export class Player {
             this.camera.position.z = this.collider.position.z
         }
 
+        if(this.currentInputs['A']) this.collider!.physicsImpostor!.restitution = 1.8;
+        else if(this.currentInputs['B']) this.collider!.physicsImpostor!.restitution = 2.5;
+        else if(this.currentInputs['LB']) this.collider!.physicsImpostor!.restitution = 0.2;
+        else this.collider!.physicsImpostor!.restitution = 1;
+
+        if(this.currentInputs['RIGHT_TRIGGER'] && this.stamina > 0.5) {
+            this.speed = 0.17
+            this.stamina -= 0.5
+        }
+        else { 
+            this.speed = 0.12
+            this.stamina += 0.25
+        }
 
         if (!this.game.options.isServer) this.animate()
     }

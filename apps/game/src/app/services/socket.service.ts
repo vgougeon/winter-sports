@@ -100,9 +100,7 @@ export class SocketService {
     practice() {
         store.dispatch(setMode('Practice'))
         this.game?.startGameMode({
-            name: 'Practice',
-            fieldHeight: 100,
-            fieldWidth: 160
+            name: 'Practice'
         })
     }
 }

@@ -9,7 +9,15 @@ export class Input {
         UP: ['Z', 'z', 'STICK_UP'],
         DOWN: ['S', 's', 'STICK_DOWN'],
         RIGHT: ['D', 'd', 'STICK_RIGHT'],
-        LEFT: ['Q', 'q', 'STICK_LEFT']
+        LEFT: ['Q', 'q', 'STICK_LEFT'],
+        LEFT_TRIGGER: ['LEFT_TRIGGER'],
+        RIGHT_TRIGGER: ['RIGHT_TRIGGER'],
+        A: ['PAD_A'],
+        B: ['PAD_B'],
+        X: ['PAD_X'],
+        Y: ['PAD_Y'],
+        RB: ['PAD_RB'],
+        LB: ['PAD_LB'],
     }
 
     inputs: Record<string, number> = {}
@@ -28,6 +36,7 @@ export class Input {
         am.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyUpTrigger, (evt) => {
             this.inputs[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown" ? 1 : 0;
         }));
+        
 
         this.gamepadManager.onGamepadConnectedObservable.add((gamepad, state) => {
             gamepad.onleftstickchanged((values) => {
@@ -43,7 +52,30 @@ export class Input {
                     if (values.x < 0) this.inputs['STICK_LEFT'] = Math.abs(values.x)
                     else this.inputs['STICK_RIGHT'] = Math.abs(values.x)
                 }
-            })
+            });
+
+            if(gamepad instanceof BABYLON.Xbox360Pad) {
+                gamepad.onlefttriggerchanged((value) => {
+                    if(value > 0.1) this.inputs['LEFT_TRIGGER'] = 1
+                    else this.inputs['LEFT_TRIGGER'] = 0
+                });
+    
+                gamepad.onrighttriggerchanged((value) => {
+                    if(value > 0.1) this.inputs['RIGHT_TRIGGER'] = 1
+                    else this.inputs['RIGHT_TRIGGER'] = 0
+                })
+
+                gamepad.onButtonDownObservable.add((button: any)=>{
+                    console.log(button, BABYLON.Xbox360Button[button])
+                    this.inputs[`PAD_${BABYLON.Xbox360Button[button]}`] = 1;
+                });
+
+                gamepad.onButtonUpObservable.add((button: any)=>{
+                    console.log(button, BABYLON.Xbox360Button[button])
+                    this.inputs[`PAD_${BABYLON.Xbox360Button[button]}`] = 0;
+                });
+
+            }
         })
     }
 
