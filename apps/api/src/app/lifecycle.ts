@@ -10,7 +10,11 @@ io.on('connection', (socket: PlayerSocket) => {
         console.log("Client left", socket.id)
     })
 
-    socket.on('queue', () => {
-        queue.addPlayer(socket)
+    socket.on('queue', (gameModes: number[] = [4]) => {
+        queue.addPlayer(socket, gameModes)
+    })
+
+    socket.on('leaveQueue', () => {
+        queue.removePlayer(socket)
     })
 });

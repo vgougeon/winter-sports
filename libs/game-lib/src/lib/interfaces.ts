@@ -47,4 +47,8 @@ export interface IInputMap {
 export interface IQueueState {
     position: number;
     inQueue: number;
+    gameModes: number[];
+    inQueue1v1: number;
+    inQueue2v2: number;
+    inQueue3v3: number;
 }

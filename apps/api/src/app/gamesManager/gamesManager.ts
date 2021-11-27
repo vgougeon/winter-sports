@@ -8,7 +8,9 @@ class GamesManager {
     }
 
     createGame(players: PlayerSocket[]) {
-        this.games.push(new Game(players))
+        const game = new Game(players)
+        this.games.push(game)
+        return game
     }
 }
 

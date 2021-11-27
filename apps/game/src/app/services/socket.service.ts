@@ -40,6 +40,7 @@ export class SocketService {
             this.socket.on('connect', () => store.dispatch(setOnline()))
 
             this.socket.on('queueState', (data: IQueueState) => store.dispatch(setQueue(data)))
+            this.socket.on('queueLeft', () => store.dispatch(setQueue(null)))
 
             this.socket.on('ping', (code: number) => this.socket?.emit('ping', code))
 
@@ -62,9 +63,14 @@ export class SocketService {
         if (this.game) this.game.playerId = gInfo.playerId
     }
 
-    queue() {
+    queue(gameModes: number[]) {
         const queue = store.getState().queue.queueState
-        if (!queue) this.socket!.emit('queue')
+        if (!queue) this.socket!.emit('queue', gameModes)
+    }
+
+    leaveQueue() {
+        const queue = store.getState().queue.queueState
+        if (queue) this.socket!.emit('leaveQueue')
     }
 
     state(state: IGameState) {

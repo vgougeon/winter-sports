@@ -4,7 +4,7 @@ import { PlayerSocket } from './../../types/player-socket.interface';
 class Queue {
     players: PlayerSocket[] = []
     loopIntervalId: NodeJS.Timeout
-    playersPerGame = 4
+    gameModes = [2, 4, 6]
 
     constructor() {
         this.loopIntervalId = setInterval(() => {
@@ -14,21 +14,31 @@ class Queue {
     }
 
     checkQueue() {
-        for(let i = 0; i < Math.floor(this.players.length / this.playersPerGame); i++) {
-            this.createGame(this.players.splice(0, this.playersPerGame))
+        for (let gameMode of this.gameModes.reverse()) {
+            const queue = this.players.filter(p => p.gamesModes.includes(gameMode))
+            for (let i = 0; i < Math.floor(queue.length / gameMode); i++) {
+                console.log("CREATING A GAME mode :", gameMode)
+                const game = this.createGame(queue.splice(0, gameMode))
+                for(let p of game.players) {
+                    this.removePlayer(p)
+                }
+                console.log(this.players)
+            }
         }
     }
 
     createGame(players: PlayerSocket[]) {
         console.log("CREATING GAME...")
-        gamesManager.createGame(players)
+        const game = gamesManager.createGame(players)
         console.log(`${gamesManager.games.length} total games`)
+        return game
     }
 
-    addPlayer(socket: PlayerSocket) {
-        if(this.players.find(player => player === socket)) return
+    addPlayer(socket: PlayerSocket, gameModes: number[]) {
+        if (this.players.find(player => player === socket)) return
+        socket.gamesModes = gameModes
         this.players.push(socket)
-        console.log(`${this.players.length} in queue`)
+        console.log(`${this.players.length} in queue for ${socket.gamesModes.map(g => `${g / 2}v${g / 2}`).join(' & ')}`)
         this.sendQueueStateToPlayer(socket)
     }
 
@@ -38,15 +48,19 @@ class Queue {
     }
 
     queueState() {
-        for(let player of this.players) {
+        for (let player of this.players) {
             this.sendQueueStateToPlayer(player)
         }
     }
 
     sendQueueStateToPlayer(socket: PlayerSocket) {
-        socket.emit('queueState', { 
-            inQueue: this.players.length, 
-            position: this.players.findIndex(player => player === socket) + 1
+        socket.emit('queueState', {
+            inQueue: this.players.length,
+            position: this.players.findIndex(player => player === socket) + 1,
+            gameModes: socket.gamesModes || [],
+            inQueue1v1: this.players.filter(p => p.gamesModes.includes(2)).length,
+            inQueue2v2: this.players.filter(p => p.gamesModes.includes(4)).length,
+            inQueue3v3: this.players.filter(p => p.gamesModes.includes(6)).length
         })
     }
 }

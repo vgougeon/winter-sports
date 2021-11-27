@@ -33,3 +33,7 @@ canvas {
     from { transform: rotateZ(0deg) }
     to { transform: rotateZ(360deg) }
 }
+
+[data-active=true] {
+    @apply bg-indigo-700 bg-opacity-50 backdrop-filter backdrop-blur shadow;
+}
