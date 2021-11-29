@@ -120,7 +120,7 @@ export class Player {
         this.collider = BABYLON.MeshBuilder.CreateBox('player_collider', { width: 2, height: this.height, depth: 1.3 }, this.game.scene)
         this.collider.translate(new BABYLON.Vector3(0, 1, 0), this.height / 2, BABYLON.Space.LOCAL)
 
-        this.collider.isVisible = true
+        this.collider.isVisible = false
         this.collider.position = this.getKickoffPosition()
         this.collider.physicsImpostor = new BABYLON.PhysicsImpostor(this.collider, BABYLON.PhysicsImpostor.BoxImpostor,
             { mass: 0, restitution: 1.3 }
