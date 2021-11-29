@@ -41,7 +41,7 @@ export class Soccer {
     goalWidth = this.depth / 6
     goalHeight = 13
     borderHeight = this.goalHeight
-    borderThickness = 3
+    borderThickness = 8
     subscriptions: {
         [key: string]: Function
     } = {}
@@ -143,7 +143,6 @@ export class Soccer {
     }
 
     generateField(): BABYLON.Mesh {
-        debugger
         const field = BABYLON.MeshBuilder.CreateBox('field', { width: this.width, height: 1, depth: this.depth })
         field.position.y = -0.51
         field.physicsImpostor = new BABYLON.PhysicsImpostor(field, BABYLON.PhysicsImpostor.BoxImpostor, {

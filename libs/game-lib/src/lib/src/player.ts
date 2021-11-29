@@ -1,6 +1,7 @@
 import { Game } from "../game-lib";
 import * as BABYLON from 'babylonjs';
 import 'babylonjs-loaders';
+import * as GUI from 'babylonjs-gui';
 import { IPlayerState } from "../interfaces";
 import { IInputMap, Soccer } from '@winter-sports/game-lib';
 
@@ -22,6 +23,9 @@ export class Player {
 
     acceleration = new BABYLON.Vector3(0, 0, 0)
     velocity = new BABYLON.Vector3(0, 0, 0)
+
+    advancedTexture?: GUI.AdvancedDynamicTexture;
+    nameplate?: GUI.TextBlock;
 
     animations: BABYLON.AnimationGroup[] = []
 
@@ -93,11 +97,11 @@ export class Player {
             }
             else RUN.stop()
         }
-        if(this.mesh) {
+        if (this.mesh) {
             // const [HEAD] = this.mesh!.getChildTransformNodes(undefined, (node) => node.name === 'HEAD')
             // HEAD.scaling = new BABYLON.Vector3(2, 2, 2)
         }
-        
+
     }
 
     getKickoffPosition() {
@@ -140,6 +144,23 @@ export class Player {
             if (this.state.teamId === 1) color = new BABYLON.Color3(0, 0, 0.15)
             const shirt = this.findMaterial('BlackPenguin') as BABYLON.StandardMaterial
             if (shirt) shirt.emissiveColor = color
+
+            if (!this.game.options.isServer) {
+                // this.advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(this.collider)
+                // this.nameplate = new GUI.TextBlock();
+                // this.nameplate.text = 'TEST';
+                // this.nameplate.color = 'white';
+                // this.nameplate.fontSize = 240
+                // var rect1 = new GUI.Rectangle();
+                // rect1.width = 0.2;
+                // rect1.height = "40px";
+                // rect1.cornerRadius = 20;
+                // rect1.color = "Orange";
+                // rect1.thickness = 4;
+                // rect1.background = "green";
+                // this.advancedTexture.addControl(rect1);
+                // this.advancedTexture.addControl(this.nameplate);
+            }
 
         }
 
