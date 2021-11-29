@@ -9,7 +9,7 @@ export class Player {
     camera: BABYLON.FreeCamera | null = null;
     mesh: BABYLON.AbstractMesh | null = null;
     speed = 0.12;
-    height = 5.5;
+    height = 4.7;
     state: IPlayerState;
     collider: BABYLON.Mesh | null = null;
 
@@ -32,7 +32,8 @@ export class Player {
         this.state = state
         if (this.state.id === this.game.playerId) this.game.setSelf(this)
 
-        this.game.scene.registerBeforeRender(this.loopCall)
+        // this.game.scene.registerBeforeRender(this.loopCall)
+        this.game.scene.onBeforePhysicsObservable.add(this.loopCall)
 
         this.init()
     }
@@ -52,26 +53,26 @@ export class Player {
         }
         else this.acceleration = this.acceleration.scaleInPlace(this.speed)
         this.velocity = this.velocity.add(this.acceleration)
-        if (!this.velocity.equals(new BABYLON.Vector3(0, 0, 0))) this.collider?.lookAt(this.collider.position.subtract(this.velocity))
+        if (this.velocity.length() > 0.05) this.collider?.lookAt(this.collider.position.subtract(this.velocity))
         if (this.collider) this.collider.moveWithCollisions(this.velocity)
-        this.velocity = this.velocity.scaleInPlace(0.8)
+        this.velocity = this.velocity.scaleInPlace(0.80)
 
-        if(this.camera && this.collider) {
+        if (this.camera && this.collider) {
             this.camera.position.x = this.collider.position.x - this.cameraDistance * m
             this.camera.position.z = this.collider.position.z
         }
 
-        if(this.currentInputs['A']) this.collider!.physicsImpostor!.restitution = 1.8;
-        else if(this.currentInputs['B']) this.collider!.physicsImpostor!.restitution = 2.5;
-        else if(this.currentInputs['LB']) this.collider!.physicsImpostor!.restitution = 0.2;
+        if (this.currentInputs['A']) this.collider!.physicsImpostor!.restitution = 1.8;
+        else if (this.currentInputs['B']) this.collider!.physicsImpostor!.restitution = 2.5;
+        else if (this.currentInputs['LB']) this.collider!.physicsImpostor!.restitution = 0.2;
         else this.collider!.physicsImpostor!.restitution = 1;
 
-        if(this.currentInputs['RIGHT_TRIGGER'] && this.stamina > 0.5) {
-            this.speed = 0.17
+        if (this.currentInputs['RIGHT_TRIGGER'] && this.stamina > 0.5) {
+            this.speed = 0.13
             this.stamina -= 0.5
         }
-        else { 
-            this.speed = 0.12
+        else {
+            this.speed = 0.10
             this.stamina += 0.25
         }
 
@@ -79,13 +80,24 @@ export class Player {
     }
 
     animate() {
-        if (this.animations[2]) {
-            if (Math.abs(this.velocity.length()) > 0.05) {
-                this.animations[2].speedRatio = (Math.abs(this.velocity.length())) * 5
-                this.animations[2].play(true)
+        const RUN = this.animations.find(a => a.name === 'Run')
+        if (RUN) {
+            // if (Math.abs(this.acceleration.length()) > 0.001) {
+            //     RUN.speedRatio = (Math.abs(this.acceleration.length())) * 15
+            //     RUN.play(true)
+            // }
+            // else RUN.stop()
+            if (Math.abs(this.velocity.length()) > 0.01) {
+                RUN.speedRatio = (Math.abs(this.velocity.length())) * 5
+                RUN.play(true)
             }
-            else this.animations[2].stop()
+            else RUN.stop()
         }
+        if(this.mesh) {
+            // const [HEAD] = this.mesh!.getChildTransformNodes(undefined, (node) => node.name === 'HEAD')
+            // HEAD.scaling = new BABYLON.Vector3(2, 2, 2)
+        }
+        
     }
 
     getKickoffPosition() {
@@ -108,14 +120,14 @@ export class Player {
         this.collider = BABYLON.MeshBuilder.CreateBox('player_collider', { width: 2, height: this.height, depth: 1.3 }, this.game.scene)
         this.collider.translate(new BABYLON.Vector3(0, 1, 0), this.height / 2, BABYLON.Space.LOCAL)
 
-        this.collider.isVisible = false
+        this.collider.isVisible = true
         this.collider.position = this.getKickoffPosition()
         this.collider.physicsImpostor = new BABYLON.PhysicsImpostor(this.collider, BABYLON.PhysicsImpostor.BoxImpostor,
             { mass: 0, restitution: 1.3 }
         )
 
         if (!this.game.options.isServer) {
-            const meshes = await BABYLON.SceneLoader.ImportMeshAsync("", "assets/", "boxes.glb", this.game.scene)
+            const meshes = await BABYLON.SceneLoader.ImportMeshAsync("", "assets/", "pingu.glb", this.game.scene)
             this.animations = meshes.animationGroups
             this.mesh = meshes.meshes[0]
             this.mesh.scaling = new BABYLON.Vector3(1, 1, 1)
@@ -124,14 +136,10 @@ export class Player {
             this.mesh.parent = this.collider
             this.mesh.setPositionWithLocalVector(new BABYLON.Vector3(0, -this.height / 2, 0))
             this.game.shadowGenerator.addShadowCaster(this.collider)
-            let color = new BABYLON.Color3(0.2, 0, 0)
-            if (this.state.teamId === 1) color = new BABYLON.Color3(0, 0, 0.2)
-            const shirt = this.findMaterial('Shirt') as BABYLON.StandardMaterial
-            if (shirt) {
-                shirt.emissiveColor = color
-                shirt.specularColor = color
-                shirt.diffuseColor = color
-            }
+            let color = new BABYLON.Color3(0.15, 0, 0)
+            if (this.state.teamId === 1) color = new BABYLON.Color3(0, 0, 0.15)
+            const shirt = this.findMaterial('BlackPenguin') as BABYLON.StandardMaterial
+            if (shirt) shirt.emissiveColor = color
 
         }
 
