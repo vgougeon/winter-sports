@@ -9,6 +9,7 @@ export class TitleScreen {
     support?: BABYLON.Mesh;
     character?: BABYLON.AbstractMesh;
     decorations: BABYLON.AbstractMesh[] = []
+    animations: BABYLON.AnimationGroup[] = []
 
     constructor(game: Game) {
         this.game = game;
@@ -21,7 +22,7 @@ export class TitleScreen {
         this.characterSupport.position.y = -5
 
         const sand = new BABYLON.StandardMaterial("sand", this.game.scene);
-        const texture = new BABYLON.Texture("assets/textures/sand.jpg", this.game.scene);
+        const texture = new BABYLON.Texture("assets/textures/snow.png", this.game.scene);
         texture.uScale = 3
         texture.vScale = 3
         sand.ambientTexture = texture
@@ -38,7 +39,7 @@ export class TitleScreen {
         this.support.position.y = -5
 
         const grass = new BABYLON.StandardMaterial("grass", this.game.scene);
-        const gtexture = new BABYLON.Texture("assets/textures/pitch2.png", this.game.scene);
+        const gtexture = new BABYLON.Texture("assets/textures/ice.jpg", this.game.scene);
         gtexture.uScale = 3
         gtexture.vScale = 3
         grass.ambientTexture = gtexture
@@ -50,7 +51,7 @@ export class TitleScreen {
         this.game.soundtrackManager.playTitleScreen()
     }
 
-    destroy() {        
+    destroy() {
         this.character?.dispose()
         this.characterSupport?.dispose()
         this.support?.dispose()
@@ -71,10 +72,13 @@ export class TitleScreen {
         // water.addToRenderList(this.game.skybox);
         // waterMesh.material = water as any;
 
-        const meshes = await BABYLON.SceneLoader.ImportMeshAsync("", "assets/", "sackboy.glb")
+        const meshes = await BABYLON.SceneLoader.ImportMeshAsync("", "assets/", "pingu.glb")
+        this.animations = meshes.animationGroups
         this.character = meshes.meshes[0]
         this.character.scaling = new BABYLON.Vector3(.3, .3, .3)
         this.game.shadowGenerator.addShadowCaster(this.character)
+
+        this.animate()
 
         const tree = await BABYLON.SceneLoader.ImportMeshAsync("", "assets/objects/", "tree.glb")
         this.addMesh(tree, new BABYLON.Vector3(-2, -0.1, 2), 0.3)
@@ -89,6 +93,23 @@ export class TitleScreen {
         loaded.meshes[0].position = position;
         loaded.meshes[0].rotateAround(loaded.meshes[0].position, new BABYLON.Vector3(0, 1, 0), yRotate)
         this.game.shadowGenerator.addShadowCaster(loaded.meshes[0])
+    }
+
+    animate() {
+        const IDLE = this.animations.find(a => a.name === 'Idle')
+        const HI = this.animations.find(a => a.name === 'Hi')
+        console.log(this.animations)
+        IDLE?.setWeightForAllAnimatables(0.5)
+        HI?.setWeightForAllAnimatables(0.5)
+        IDLE?.start(true, 1, undefined, undefined, true)
+        HI?.start(true, 1, undefined, undefined, true)
+        // const hi = this.game.scene.beginWeightedAnimation(HI, HI?.from!, HI?.to!, 0.5)
+
+
+        // IDLE?.play(false).onAnimationGroupEndObservable.add(() => {
+        //     console.log(HI)
+        //     HI?.play(true)
+        // })
     }
 
 }
