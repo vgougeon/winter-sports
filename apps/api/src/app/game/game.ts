@@ -131,7 +131,7 @@ export class Game {
         const createPlayer = new Player(this.game, {
             id: player.id,
             teamId: this.game.players.length % 2,
-            name: player.pseudo || 'NO_NAME'
+            name: player.pseudo || 'Jabu Jabu'
         })
         this.game.players.push(createPlayer)
 

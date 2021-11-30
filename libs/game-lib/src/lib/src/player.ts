@@ -4,7 +4,7 @@ import 'babylonjs-loaders';
 import * as GUI from 'babylonjs-gui';
 import { IPlayerState } from "../interfaces";
 import { IInputMap, Soccer } from '@winter-sports/game-lib';
-
+import gsap from 'gsap';
 export class Player {
     game: Game;
     camera: BABYLON.FreeCamera | null = null;
@@ -25,6 +25,7 @@ export class Player {
     velocity = new BABYLON.Vector3(0, 0, 0)
 
     advancedTexture?: GUI.AdvancedDynamicTexture;
+    nameplatePlane?: BABYLON.Mesh;
     nameplate?: GUI.TextBlock;
 
     animations: BABYLON.AnimationGroup[] = []
@@ -80,7 +81,18 @@ export class Player {
             this.stamina += 0.25
         }
 
-        if (!this.game.options.isServer) this.animate()
+        if (!this.game.options.isServer) {
+            if(this.game.self && this !== this.game.self) {
+                if(this.nameplate) {
+                    this.nameplate.color = gsap.utils.pipe(
+                        gsap.utils.mapRange(20, 120, 0, 1),
+                        gsap.utils.clamp(0, 1),
+                        gsap.utils.interpolate('#ffffffff', '#ffffff00')
+                    )(this.collider!.position.subtract(this.game.self.collider!.position).length())
+                }
+            }
+            this.animate()
+        }
     }
 
     animate() {
@@ -145,23 +157,22 @@ export class Player {
             const shirt = this.findMaterial('BlackPenguin') as BABYLON.StandardMaterial
             if (shirt) shirt.emissiveColor = color
 
-            if (!this.game.options.isServer) {
-                // this.advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(this.collider)
-                // this.nameplate = new GUI.TextBlock();
-                // this.nameplate.text = 'TEST';
-                // this.nameplate.color = 'white';
-                // this.nameplate.fontSize = 240
-                // var rect1 = new GUI.Rectangle();
-                // rect1.width = 0.2;
-                // rect1.height = "40px";
-                // rect1.cornerRadius = 20;
-                // rect1.color = "Orange";
-                // rect1.thickness = 4;
-                // rect1.background = "green";
-                // this.advancedTexture.addControl(rect1);
-                // this.advancedTexture.addControl(this.nameplate);
+            if(this.state.id !== this.game.playerId) {
+                this.nameplatePlane = BABYLON.MeshBuilder.CreatePlane('nameplate', { width: 10, height: 10}, this.game.scene)
+                this.nameplatePlane.parent = this.collider
+                this.nameplatePlane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
+                this.nameplatePlane.locallyTranslate(new BABYLON.Vector3(0, 4, 0))
+                this.advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(this.nameplatePlane)
+                this.nameplate = new GUI.TextBlock();
+                this.nameplate.text = this.state.name;
+                this.nameplate.shadowBlur = 10
+                this.nameplate.fontSizeInPixels = 80;
+                this.nameplate.fontWeight = 'bold';
+                this.nameplate.color = '#ffffff99'
+                // this.nameplate.outlineColor = 'black';
+                // this.nameplate.outlineWidth = 8;
+                this.advancedTexture.addControl(this.nameplate);
             }
-
         }
 
         this.createCamera()
@@ -186,6 +197,7 @@ export class Player {
             this.camera.position.z = this.collider.position.z
         }
         if (this.game.playerId === this.state.id) {
+            this.game.self = this
             this.game.followPlayer(this)
         }
     }
