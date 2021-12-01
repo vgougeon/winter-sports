@@ -11,6 +11,8 @@ export class TitleScreen {
     decorations: BABYLON.AbstractMesh[] = []
     animations: BABYLON.AnimationGroup[] = []
 
+    light: BABYLON.PointLight;
+
     constructor(game: Game) {
         this.game = game;
         (this.game.camera as BABYLON.ArcRotateCamera).beta = Math.PI / 1.9;
@@ -22,6 +24,7 @@ export class TitleScreen {
         this.characterSupport.position.y = -5
 
         const sand = new BABYLON.StandardMaterial("sand", this.game.scene);
+        sand.specularColor = new BABYLON.Color3(0.1, 0.1, 0.3)
         const texture = new BABYLON.Texture("assets/textures/snow.png", this.game.scene);
         texture.uScale = 3
         texture.vScale = 3
@@ -39,14 +42,18 @@ export class TitleScreen {
         this.support.position.y = -5
 
         const grass = new BABYLON.StandardMaterial("grass", this.game.scene);
+        grass.specularColor = new BABYLON.Color3(0, 0, 0)
         const gtexture = new BABYLON.Texture("assets/textures/ice.jpg", this.game.scene);
         gtexture.uScale = 3
         gtexture.vScale = 3
         grass.ambientTexture = gtexture
         this.support.material = grass
-        this.support.receiveShadows = true
+        this.support.receiveShadows = false
         this.support.rotation.x = -0.07
 
+        this.light = new BABYLON.PointLight('titlescreen-light', new BABYLON.Vector3(-2, 5, 2), this.game.scene)
+        this.light.diffuse = new BABYLON.Color3(0.97, 0.74, 0.25)
+        this.light.intensity = 0.8
 
         this.game.soundtrackManager.playTitleScreen()
     }
@@ -56,6 +63,7 @@ export class TitleScreen {
         this.characterSupport?.dispose()
         this.support?.dispose()
         this.decorations.map(d => d.dispose())
+        this.light.dispose()
     }
 
     async init() {

@@ -2,6 +2,7 @@ import { Game } from "../game-lib";
 import * as BABYLON from 'babylonjs';
 import 'babylonjs-loaders';
 import { Player } from '@winter-sports/game-lib';
+import gsap from "gsap";
 
 export class Soccer {
     game: Game;
@@ -74,6 +75,8 @@ export class Soccer {
 
         this.field = this.generateField()
         this.generateBorders()
+
+        gsap.to(this.game, { time: 12, duration: 10 })
 
         game.scene.registerBeforeRender(this.loopCall)
     }
@@ -155,6 +158,7 @@ export class Soccer {
 
         if (!this.game.options.isServer) {
             const grass = new BABYLON.StandardMaterial("grass", this.game.scene);
+            grass.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2)
             const texture = new BABYLON.Texture("assets/textures/pitch2.png", this.game.scene);
             texture.uScale = 6
             texture.vScale = 12

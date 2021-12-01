@@ -2,7 +2,7 @@ import { IGameState, IGInfo, IInputMap, IQueueState } from "@winter-sports/game-
 import { io, Socket } from "socket.io-client";
 import { Game as GameInstance } from '@winter-sports/game-lib'
 import { Game } from './../game/game';
-import { resetSocket, setAverageDelta, setError, setFPS, setOnline, setPing } from "../store/socketSlice";
+import { resetSocket, setAverageDelta, setError, setFPS, setOnline, setPing, setPseudo } from "../store/socketSlice";
 import store from "../store/store";
 import { setQueue } from "../store/queueSlice";
 import { setMode, setTeam1, setTeam2, setTimer } from "../store/gameSlice";
@@ -38,6 +38,7 @@ export class SocketService {
                 store.dispatch(setError())
             })
             this.socket.on('connect', () => store.dispatch(setOnline()))
+            this.socket.on('pseudoSet', (pseudo: string) => store.dispatch(setPseudo(pseudo)))
 
             this.socket.on('queueState', (data: IQueueState) => store.dispatch(setQueue(data)))
             this.socket.on('queueLeft', () => store.dispatch(setQueue(null)))
@@ -95,6 +96,10 @@ export class SocketService {
 
     input(inputs: IInputMap) {
         this.socket?.emit('i', inputs)
+    }
+
+    setPseudo(pseudo: string) {
+        this.socket?.emit('pseudo', pseudo)
     }
 
     practice() {

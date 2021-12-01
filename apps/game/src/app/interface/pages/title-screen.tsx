@@ -9,6 +9,7 @@ import socketService from '../../services/socket.service';
 import { useSelector } from 'react-redux';
 import { useState } from 'react';
 import { IQueueState } from '@winter-sports/game-lib';
+import { motion } from 'framer-motion';
 
 function TitleScreen() {
     const queueState: IQueueState = useSelector((state: any) => state.queue.queueState)
@@ -20,7 +21,8 @@ function TitleScreen() {
         else setGameModes([...gameModes, gameMode])
     }
     return (
-        <div className="absolute text-white top-24">
+        <motion.div initial={{ opacity: 0, scale: 0.5}} animate={{ opacity: 1, scale: 1}} exit={{ opacity: 0, scale: 0.5 }}
+        className="absolute text-white top-24">
             <div className="ml-24">
                 <h2 className="text-xl italic font-medium leading-none filter drop-shadow">JABU JABU</h2>
                 <h1 className="relative text-6xl font-extrabold">
@@ -76,7 +78,7 @@ function TitleScreen() {
                     Settings
                 </Button>
             </div>
-        </div>
+        </motion.div>
     )
 }
 

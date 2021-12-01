@@ -66,7 +66,6 @@ export class Player {
             this.camera.position.x = this.collider.position.x - this.cameraDistance * m
             this.camera.position.z = this.collider.position.z
         }
-
         if (this.currentInputs['A']) this.collider!.physicsImpostor!.restitution = 1.8;
         else if (this.currentInputs['B']) this.collider!.physicsImpostor!.restitution = 2.5;
         else if (this.currentInputs['LB']) this.collider!.physicsImpostor!.restitution = 0.2;
@@ -82,12 +81,12 @@ export class Player {
         }
 
         if (!this.game.options.isServer) {
-            if(this.game.self && this !== this.game.self) {
-                if(this.nameplate) {
+            if (this.game.self && this !== this.game.self) {
+                if (this.nameplate) {
                     this.nameplate.color = gsap.utils.pipe(
-                        gsap.utils.mapRange(20, 120, 0, 1),
+                        gsap.utils.mapRange(20, 80, 0, 1),
                         gsap.utils.clamp(0, 1),
-                        gsap.utils.interpolate('#ffffffff', '#ffffff00')
+                        gsap.utils.interpolate(['#ffffffff', '#ffffffff', '#ffffffff', '#ffffffff', '#ffffff00'])
                     )(this.collider!.position.subtract(this.game.self.collider!.position).length())
                 }
             }
@@ -142,6 +141,7 @@ export class Player {
             { mass: 0, restitution: 1.3 }
         )
 
+
         if (!this.game.options.isServer) {
             const meshes = await BABYLON.SceneLoader.ImportMeshAsync("", "assets/", "pingu.glb", this.game.scene)
             this.animations = meshes.animationGroups
@@ -155,10 +155,10 @@ export class Player {
             let color = new BABYLON.Color3(0.15, 0, 0)
             if (this.state.teamId === 1) color = new BABYLON.Color3(0, 0, 0.15)
             const shirt = this.findMaterial('BlackPenguin') as BABYLON.StandardMaterial
-            if (shirt) shirt.emissiveColor = color
+            if(shirt) shirt.emissiveColor = color
 
-            if(this.state.id !== this.game.playerId) {
-                this.nameplatePlane = BABYLON.MeshBuilder.CreatePlane('nameplate', { width: 10, height: 10}, this.game.scene)
+            if (this.state.id !== this.game.playerId) {
+                this.nameplatePlane = BABYLON.MeshBuilder.CreatePlane('nameplate', { width: 10, height: 10 }, this.game.scene)
                 this.nameplatePlane.parent = this.collider
                 this.nameplatePlane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
                 this.nameplatePlane.locallyTranslate(new BABYLON.Vector3(0, 4, 0))

@@ -14,6 +14,11 @@ io.on('connection', (socket: PlayerSocket) => {
         queue.addPlayer(socket, gameModes)
     })
 
+    socket.on('pseudo', (pseudo: string) => {
+        socket.pseudo = pseudo
+        socket.emit('pseudoSet', pseudo)
+    })
+
     socket.on('leaveQueue', () => {
         queue.removePlayer(socket)
     })

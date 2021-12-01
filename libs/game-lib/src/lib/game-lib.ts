@@ -7,6 +7,7 @@ import { TitleScreen } from './src/titleScreen';
 import { SoundtrackManager } from './src/soundtrackManager';
 import { Input } from './src/input';
 import { IInputMap } from '@winter-sports/game-lib';
+import { gsap } from 'gsap'
 
 export class Game {
   canvas?: HTMLCanvasElement
@@ -16,7 +17,9 @@ export class Game {
   hemisphericLight: BABYLON.HemisphericLight;
   light: BABYLON.DirectionalLight
   shadowGenerator: BABYLON.ShadowGenerator;
-  skybox?: BABYLON.Mesh
+  skyboxDay?: BABYLON.Mesh
+  skyboxNight?: BABYLON.Mesh
+  time: number = 0;
 
   gameMode: IGameMode | null = null
   mode?: Soccer | TitleScreen;
@@ -88,14 +91,71 @@ export class Game {
   }
 
   generateSkybox() {
-    this.skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 750 }, this.scene);
-    const skyboxMaterial = new BABYLON.StandardMaterial("skyBox", this.scene);
-    skyboxMaterial.backFaceCulling = false;
-    skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("assets/skybox/sunny", this.scene);
-    skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
-    skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
-    skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-    this.skybox.material = skyboxMaterial;
+    
+    const dayMaterial = new BABYLON.StandardMaterial("skyBox", this.scene);
+    dayMaterial.backFaceCulling = false;
+    dayMaterial.reflectionTexture = new BABYLON.CubeTexture("assets/skybox/sunny", this.scene);
+    dayMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+    dayMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+    dayMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+
+    const nightMaterial = new BABYLON.StandardMaterial("skyBox", this.scene);
+    nightMaterial.backFaceCulling = false;
+    nightMaterial.reflectionTexture = new BABYLON.CubeTexture("assets/skybox/night", this.scene);
+    nightMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+    nightMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+    nightMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+
+    this.skyboxDay = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 780 }, this.scene);
+    this.skyboxNight = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 750 }, this.scene);
+
+    this.skyboxDay.material = dayMaterial;
+    this.skyboxNight.material = nightMaterial;
+
+    this.skyboxDay.visibility = 0.5
+    this.skyboxNight.visibility = 0
+
+    this.scene.registerBeforeRender(this.timeCycle.bind(this))
+  }
+
+  timeCycle() {
+    if(this.time >= 24) this.time = 0
+
+    const dayVisibility = gsap.utils.pipe(
+      gsap.utils.mapRange(0, 24, 0, 1),
+      gsap.utils.interpolate([0, 0, 1, 1, 0, 0])
+    )
+
+    const nightVisibility = gsap.utils.pipe(
+      gsap.utils.mapRange(0, 24, 0, 1),
+      gsap.utils.interpolate([1, 1, 0, 0, 1, 1])
+    )
+
+    const lightIntensity = gsap.utils.pipe(
+      gsap.utils.mapRange(0, 24, 0, 1),
+      gsap.utils.interpolate([0.1, 0.1, 0.8, 0.8, 0.1, 0.1])
+    )
+
+    const hemisphericLightIntensity = gsap.utils.pipe(
+      gsap.utils.mapRange(0, 24, 0, 1),
+      gsap.utils.interpolate([0.1, 0.1, 0.5, 0.5, 0.1, 0.1])
+    )
+
+    const color = gsap.utils.pipe(
+      gsap.utils.mapRange(0, 24, 0, 1),
+      gsap.utils.interpolate(['#2222ff', '#2222ff', '#ffffff', '#ffffff', '#2222ff', '#2222ff'])
+    )
+
+    this.skyboxDay!.visibility = dayVisibility(this.time)
+    this.skyboxNight!.visibility = nightVisibility(this.time)
+    this.light.intensity = lightIntensity(this.time)
+    this.hemisphericLight.intensity = hemisphericLightIntensity(this.time)
+    const c = gsap.utils.splitColor(color(this.time))
+    this.hemisphericLight.diffuse = new BABYLON.Color3(
+      gsap.utils.mapRange(0, 255, 0, 1, c[0]), 
+      gsap.utils.mapRange(0, 255, 0, 1, c[1]), 
+      gsap.utils.mapRange(0, 255, 0, 1, c[2])
+    )
   }
 
   followPlayer(player: Player) {
