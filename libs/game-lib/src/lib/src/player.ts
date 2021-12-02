@@ -194,7 +194,7 @@ export class Player {
     createCamera() {
         this.camera = new BABYLON.FreeCamera('player_camera', new BABYLON.Vector3(-this.cameraDistance, this.cameraHeight, 0), this.game.scene)
         this.camera.lockedTarget = this.collider
-        this.camera.fov = 0.8
+        this.camera.fov = 1
         let m = this.state.teamId === 0 ? 1 : -1
         if (this.camera && this.collider) {
             this.camera.position.x = this.collider.position.x - this.cameraDistance * m
