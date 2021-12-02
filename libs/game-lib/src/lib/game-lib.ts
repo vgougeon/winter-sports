@@ -20,6 +20,7 @@ export class Game {
   skyboxDay?: BABYLON.Mesh
   skyboxNight?: BABYLON.Mesh
   time: number = 0;
+  gravity = -0.1;
 
   gameMode: IGameMode | null = null
   mode?: Soccer | TitleScreen;
@@ -37,6 +38,7 @@ export class Game {
   constructor(engine: BABYLON.Engine, options: IGameOptions = {}) {
     this.engine = engine
     this.scene = new BABYLON.Scene(this.engine)
+    this.scene.collisionsEnabled = true
     this.camera = new BABYLON.ArcRotateCamera('main', -Math.PI / 2, 1.58, 10, new BABYLON.Vector3(0, 1, 0), this.scene)
     if (options.canvas) {
       this.canvas = options.canvas
@@ -51,6 +53,9 @@ export class Game {
     this.light.intensity = 1
     this.light.position = new BABYLON.Vector3(20, 40, 20);
     this.shadowGenerator = new BABYLON.ShadowGenerator(1024, this.light)
+
+    this.scene.gravity = new BABYLON.Vector3(0, this.gravity, 0)
+
 
     this.soundtrackManager = new SoundtrackManager(this)
 

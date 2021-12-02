@@ -1,6 +1,5 @@
 import express, { Application } from 'express';
 import SocketIO from "socket.io";
-import { Game } from './app/game/game';
 
 const app: Application = express();
 

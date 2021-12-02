@@ -10,6 +10,7 @@ export class Player {
     camera: BABYLON.FreeCamera | null = null;
     mesh: BABYLON.AbstractMesh | null = null;
     speed = 0.12;
+
     height = 4.7;
     state: IPlayerState;
     collider: BABYLON.Mesh | null = null;
@@ -44,6 +45,8 @@ export class Player {
     }
 
     loop() {
+        const dt = this.game.engine.getDeltaTime()
+        //TODO: Rework all movements, add gravity
         if (!this.game.options.isServer && this.state.id === 'self') this.currentInputs = this.game.currentInputs
 
         let m = this.state.teamId === 0 ? 1 : -1
@@ -133,13 +136,14 @@ export class Player {
     async init() {
         //TODO: if this is late, socket will CRASH !!!!!!
         this.collider = BABYLON.MeshBuilder.CreateBox('player_collider', { width: 2, height: this.height, depth: 1.3 }, this.game.scene)
-        this.collider.translate(new BABYLON.Vector3(0, 1, 0), this.height / 2, BABYLON.Space.LOCAL)
-
+        // this.collider.translate(new BABYLON.Vector3(0, 1, 0), this.height / 2, BABYLON.Space.LOCAL)
+        this.collider.ellipsoidOffset = new BABYLON.Vector3(0, -1, 0)
         this.collider.isVisible = false
         this.collider.position = this.getKickoffPosition()
         this.collider.physicsImpostor = new BABYLON.PhysicsImpostor(this.collider, BABYLON.PhysicsImpostor.BoxImpostor,
             { mass: 0, restitution: 1.3 }
         )
+        this.collider.checkCollisions = true
 
 
         if (!this.game.options.isServer) {
@@ -196,12 +200,11 @@ export class Player {
             this.camera.position.x = this.collider.position.x - this.cameraDistance * m
             this.camera.position.z = this.collider.position.z
         }
-        if (this.game.playerId === this.state.id) {
+        if (this.game.playerId === this.state.id || this.state.id === 'self') {
             this.game.self = this
             this.game.followPlayer(this)
         }
     }
-
 
     destroy() {
         this.collider?.dispose()
