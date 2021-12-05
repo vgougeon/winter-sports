@@ -53,7 +53,7 @@ class Queue {
     }
 
     sendQueueStateToPlayer(socket: PlayerSocket) {
-        socket.emit('queueState', {
+        socket.volatile.emit('queueState', {
             inQueue: this.players.length,
             position: this.players.findIndex(player => player === socket) + 1,
             gameModes: socket.gamesModes || [],

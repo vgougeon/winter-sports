@@ -95,7 +95,7 @@ export class SocketService {
     }
 
     input(inputs: IInputMap) {
-        this.socket?.emit('i', inputs)
+        this.socket?.volatile.emit('i', inputs)
     }
 
     setPseudo(pseudo: string) {

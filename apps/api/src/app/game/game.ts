@@ -60,7 +60,7 @@ export class Game {
 
     ping() {
         this.lastPing = { time: dayjs(), code: Math.random() }
-        for (let player of this.players) player.emit('ping', this.lastPing.code)
+        for (let player of this.players) player.volatile.emit('ping', this.lastPing.code)
     }
 
     pong(socket: PlayerSocket, code: number) {
@@ -161,7 +161,7 @@ export class Game {
         this.updateGameState()
         if (this.game.mode) {
             for (let player of this.players) {
-                player.emit('g', this.gameState)
+                player.volatile.emit('g', this.gameState)
             }
         }
     }
