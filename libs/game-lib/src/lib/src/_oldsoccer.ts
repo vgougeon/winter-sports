@@ -3,6 +3,7 @@ import * as BABYLON from 'babylonjs';
 import 'babylonjs-loaders';
 import { Player } from '@winter-sports/game-lib';
 import gsap from "gsap";
+import dayjs from 'dayjs';
 
 export class Soccer {
     game: Game;
@@ -16,6 +17,7 @@ export class Soccer {
     blueGoal: BABYLON.Mesh[] = []
     redGoalZone?: BABYLON.Mesh
     blueGoalZone?: BABYLON.Mesh
+    state: string = 'waiting-for-players';
 
     loopCall = this.loop.bind(this)
 
@@ -76,7 +78,7 @@ export class Soccer {
         this.field = this.generateField()
         this.generateBorders()
 
-        gsap.to(this.game, { time: 12, duration: 10 })
+        gsap.to(this.game, { time: 12, duration: 2 })
 
         game.scene.registerBeforeRender(this.loopCall)
     }
@@ -87,6 +89,13 @@ export class Soccer {
                 id: 'self', name: '', teamId: Math.floor(Math.random()*2) })
             this.game.players.push(player)
         }
+        this.kickOff()
+    }
+
+    kickOff() {
+        for(let player of this.game.players) player.collider!.position = player.getKickoffPosition()
+        this.state = 'kickoff'
+        setTimeout(() => this.state = 'play', 3000)
     }
 
     loop() {
@@ -131,7 +140,7 @@ export class Soccer {
                 parameter: this.game.scene.getMeshByName("redGoalZone"),
             }, () => {
                 ball.actionManager?.dispose()
-                this.subscriptions.redGoal?.()
+                this.goalScored(0)
             }));
         ball.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
             {
@@ -139,10 +148,17 @@ export class Soccer {
                 parameter: this.game.scene.getMeshByName("blueGoalZone"),
             }, () => {
                 ball.actionManager?.dispose()
-                this.subscriptions.blueGoal?.()
+                this.goalScored(1)
             }));
 
         return ball
+    }
+
+    goalScored(team: number) {
+        if(team === 0) this.subscriptions.redGoal?.()
+        else  this.subscriptions.blueGoal?.()
+
+        this.kickOff()
     }
 
     generateField(): BABYLON.Mesh {
@@ -310,10 +326,10 @@ export class Soccer {
             wideTexture.vScale = 2
             material.diffuseTexture = texture
             wideMaterial.diffuseTexture = wideTexture
-            material.useAlphaFromDiffuseTexture = true
-            wideMaterial.useAlphaFromDiffuseTexture = true
-            material.alpha = 0.5
-            wideMaterial.alpha = 0.5
+            material.useAlphaFromDiffuseTexture = false
+            wideMaterial.useAlphaFromDiffuseTexture = false
+            // material.alpha = 0.5
+            // wideMaterial.alpha = 0.5
 
             this.borders[5].material = material
             this.borders[4].material = material

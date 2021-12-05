@@ -19,9 +19,9 @@ class Queue {
             for (let i = 0; i < Math.floor(queue.length / gameMode); i++) {
                 console.log("CREATING A GAME mode :", gameMode)
                 const game = this.createGame(queue.splice(0, gameMode))
-                for(let p of game.players) {
-                    this.removePlayer(p)
-                }
+                // for(let p of game.players) {
+                //     this.removePlayer(p)
+                // }
             }
         }
     }

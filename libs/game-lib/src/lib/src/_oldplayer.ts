@@ -45,10 +45,12 @@ export class Player {
     }
 
     loop() {
+        
+
         const dt = this.game.engine.getDeltaTime()
         //TODO: Rework all movements, add gravity
         if (!this.game.options.isServer && this.state.id === 'self') this.currentInputs = this.game.currentInputs
-
+        if(this.game.mode instanceof Soccer && this.game.mode.state === 'kickoff') this.currentInputs = {}
         let m = this.state.teamId === 0 ? 1 : -1
 
         this.acceleration = new BABYLON.Vector3(
