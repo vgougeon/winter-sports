@@ -1,5 +1,6 @@
 import { Game } from '../../../game-lib';
-import { Player } from '../../player/player';
+import { BasePlayer } from '../../player/player';
+import { SoccerPlayer } from './player';
 import { SoccerWorld } from './world';
 
 export class Soccer {
@@ -7,7 +8,6 @@ export class Soccer {
     constructor(private game: Game) {}
     init() {
         this.world = new SoccerWorld(this.game, this)
-
-        // const player = new Player(this.game)
+        const player = new SoccerPlayer(this.game, this)
     }
 }

@@ -9,12 +9,17 @@ export class Skybox {
     hemisphericLight!: BABYLON.HemisphericLight;
     light!: BABYLON.DirectionalLight
     time: number = 0;
+    shadowGenerator!: BABYLON.ShadowGenerator;
 
     constructor(private game: Game) { 
         this.generateLight()
         this.generateSkybox()
+        this.shadowGenerator = new BABYLON.ShadowGenerator(1024, this.light)
+        this.shadowGenerator.useBlurExponentialShadowMap = true
+        this.shadowGenerator.blurScale = 2
+        this.shadowGenerator.darkness = 0.8
         this.game.scene.registerBeforeRender(() => {
-            this.time += 0.0004
+            this.time += 0.0016
         })
     }
 
@@ -69,7 +74,7 @@ export class Skybox {
 
         const lightIntensity = gsap.utils.pipe(
             gsap.utils.mapRange(0, 24, 0, 1),
-            gsap.utils.interpolate([0.1, 0.8, 0.1])
+            gsap.utils.interpolate([0.2, 0.8, 0.2])
         )
 
         const hemisphericLightIntensity = gsap.utils.pipe(

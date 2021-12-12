@@ -1,7 +1,7 @@
-import { Player } from "./player";
+import { BasePlayer } from "./player";
 
 export class PlayerCamera {
-    constructor(private player: Player) {}
+    constructor(private player: BasePlayer) {}
 
     create() {
         

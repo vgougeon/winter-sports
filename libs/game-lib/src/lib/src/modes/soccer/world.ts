@@ -24,11 +24,19 @@ export class SoccerWorld {
         this.under = this.createUnder()
         this.borders = this.createBorders()
         this.createGoals()
+
         if (this.game.canvas) {
             this.lines = this.createLines()
             this.lights = this.createLights()
             this.applyTextures()
+            this.enableShadows()
         }
+
+    }
+
+    enableShadows() {
+        for (let mesh of this.redGoal) this.game.skybox.shadowGenerator.addShadowCaster(mesh)
+        for (let mesh of this.blueGoal) this.game.skybox.shadowGenerator.addShadowCaster(mesh)
     }
 
     createField() {
@@ -36,12 +44,13 @@ export class SoccerWorld {
         field.position.y = -0.51
         field.physicsImpostor = new BABYLON.PhysicsImpostor(field,
             BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 1, friction: 10 }, this.game.scene);
+        field.checkCollisions = true
         return field
     }
 
     createUnder() {
-        const under = BABYLON.MeshBuilder.CreateDisc('under', { radius: this.settings.width})
-        under.rotation.x = Math.PI/2
+        const under = BABYLON.MeshBuilder.CreateDisc('under', { radius: this.settings.width })
+        under.rotation.x = Math.PI / 2
         under.position.y = -1
         under.physicsImpostor = new BABYLON.PhysicsImpostor(under,
             BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 1, friction: 10 }, this.game.scene);
@@ -175,6 +184,11 @@ export class SoccerWorld {
         const { goalHeight, goalWidth, width } = this.settings
         const diameter = 1.5
         const goalDepth = 10
+        const goalMaterial = new BABYLON.StandardMaterial('goal', this.game.scene)
+        goalMaterial.specularColor = new BABYLON.Color3(0, 0, 0)
+        goalMaterial.ambientColor = new BABYLON.Color3(0, 0, 0)
+
+        // goalMaterial.disableLighting = true
         const genGoal = (direction: number) => {
             const g: BABYLON.Mesh[] = []
             g[0] = BABYLON.MeshBuilder.CreateCylinder(`goal${direction}`, { height: goalHeight + diameter, diameter: diameter, tessellation: 8 })
@@ -210,17 +224,19 @@ export class SoccerWorld {
             g[7].position = new BABYLON.Vector3(direction * width / 2 + direction * goalDepth, goalHeight - 0.7, 0)
             g[7].rotation.x = Math.PI / 2
 
+            for(let mesh of g) mesh.material = goalMaterial
+
             return g
         }
 
-        this.redGoal == genGoal(1)
-        this.blueGoal == genGoal(-1)
+        this.redGoal = genGoal(1)
+        this.blueGoal = genGoal(-1)
 
 
         this.redGoalZone = BABYLON.MeshBuilder.CreateBox('redGoalZone', {
             width: goalDepth, height: goalHeight - 3, depth: goalWidth - 3, sideOrientation: BABYLON.Mesh.BACKSIDE
         })
-        this.redGoalZone.position = new BABYLON.Vector3(width / 2 + goalDepth / 2 , goalHeight / 2 - 1, 0)
+        this.redGoalZone.position = new BABYLON.Vector3(width / 2 + goalDepth / 2, goalHeight / 2 - 1, 0)
 
 
         this.blueGoalZone = BABYLON.MeshBuilder.CreateBox('blueGoalZone', {
@@ -236,7 +252,7 @@ export class SoccerWorld {
         const genLight = (p: BABYLON.Vector3) => {
             const l = new BABYLON.PointLight('fLight', p, this.game.scene);
             l.intensity = 0;
-            gsap.to(l, { intensity: 3, duration: 15, delay: lights.length * 0.5,})
+            gsap.to(l, { intensity: 3, duration: 15, delay: lights.length * 0.5, })
             return l;
         }
 

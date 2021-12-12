@@ -13,6 +13,7 @@ export class Game {
   scene!: BABYLON.Scene
   camera!: BABYLON.Camera
   skybox!: Skybox;
+  shadowGenerator?: BABYLON.ShadowGenerator;
 
   input?: Input;
   currentInputs: IInputMap = {};
@@ -32,6 +33,7 @@ export class Game {
     this.options = options
     this.skybox = new Skybox(this)
 
+    this.input = new Input(this)
     this.engine.runRenderLoop(() => {
       this.scene.render();
     });

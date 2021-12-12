@@ -11,11 +11,15 @@ export function App() {
   }
   useLayoutEffect(() => {
     init()
+    window.addEventListener('resize', () => {
+      console.log("RESIZE")
+      socketService.game?.engine.resize()
+    })
   }, [])
   return (
     <Provider store={store}>
       <UI />
-      <canvas ref={ ref }></canvas>
+      <canvas ref={ ref } width={ window.innerWidth } height={ window.innerHeight }></canvas>
     </Provider>
   );
 }
