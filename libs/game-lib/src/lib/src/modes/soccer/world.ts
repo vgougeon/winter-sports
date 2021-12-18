@@ -15,8 +15,20 @@ export class SoccerWorld {
     blueGoalZone!: BABYLON.Mesh;
 
     settings = {
-        width: 200, depth: 120, thickness: 1, borderHeight: 5,
+        width: 250, depth: 140, thickness: 1, borderHeight: 5,
         borderTickness: 0.5, goalWidth: 40, goalHeight: 15, underOffset: 15
+    }
+
+    destroy() {
+        this.field.dispose()
+        this.under.dispose()
+        this.redGoalZone.dispose()
+        this.blueGoalZone.dispose()
+        for(let item of this.lines) item.dispose()
+        for(let item of this.borders) item.dispose()
+        for(let item of this.lights) item.dispose()
+        for(let item of this.redGoal) item.dispose()
+        for(let item of this.blueGoal) item.dispose()
     }
 
     constructor(private game: Game, private soccer: Soccer) {
@@ -54,6 +66,7 @@ export class SoccerWorld {
         under.position.y = -1
         under.physicsImpostor = new BABYLON.PhysicsImpostor(under,
             BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 1, friction: 10 }, this.game.scene);
+        under.checkCollisions = true
         return under
     }
 
@@ -236,13 +249,13 @@ export class SoccerWorld {
         this.redGoalZone = BABYLON.MeshBuilder.CreateBox('redGoalZone', {
             width: goalDepth, height: goalHeight - 3, depth: goalWidth - 3, sideOrientation: BABYLON.Mesh.BACKSIDE
         })
-        this.redGoalZone.position = new BABYLON.Vector3(width / 2 + goalDepth / 2, goalHeight / 2 - 1, 0)
+        this.redGoalZone.position = new BABYLON.Vector3(width / 2 + (goalDepth / 2 + 3), goalHeight / 2 - 1, 0)
 
 
         this.blueGoalZone = BABYLON.MeshBuilder.CreateBox('blueGoalZone', {
             width: goalDepth, height: goalHeight - 3, depth: goalWidth - 3, sideOrientation: BABYLON.Mesh.BACKSIDE
         })
-        this.blueGoalZone.position = new BABYLON.Vector3(-width / 2 - goalDepth / 2, goalHeight / 2 - 1, 0)
+        this.blueGoalZone.position = new BABYLON.Vector3(-width / 2 - (goalDepth / 2 + 3), goalHeight / 2 - 1, 0)
     }
 
     createLights() {
@@ -317,4 +330,5 @@ export class SoccerWorld {
         netMaterial.disableLighting = true
         //#endregion
     }
+
 }

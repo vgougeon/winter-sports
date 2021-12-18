@@ -6,7 +6,7 @@ import { IInputMap } from '@winter-sports/game-lib';
 import { Playground } from './src/modes/playground/playground';
 import { Skybox } from './src/misc/skybox';
 import { Soccer } from './src/modes/soccer/soccer';
-
+BABYLON.Animation.AllowMatricesInterpolation = true;
 export class Game {
   canvas?: HTMLCanvasElement
   server: boolean = false;

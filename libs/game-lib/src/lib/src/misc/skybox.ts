@@ -17,9 +17,9 @@ export class Skybox {
         this.shadowGenerator = new BABYLON.ShadowGenerator(1024, this.light)
         this.shadowGenerator.useBlurExponentialShadowMap = true
         this.shadowGenerator.blurScale = 2
-        this.shadowGenerator.darkness = 0.8
+        this.shadowGenerator.darkness = 0.5
         this.game.scene.registerBeforeRender(() => {
-            this.time += 0.0016
+            // this.time += 0.0016
         })
     }
 
