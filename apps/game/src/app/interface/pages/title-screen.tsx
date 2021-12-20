@@ -5,7 +5,7 @@ import { GiStaticGuard } from 'react-icons/gi';
 import { RiSettings3Fill } from 'react-icons/ri';
 import { BsConeStriped, BsFillBookmarkCheckFill, BsBookmark } from 'react-icons/bs'
 import { BiWorld } from 'react-icons/bi';
-import socketService from '../../services/socket.service';
+import socketService from '../../services/sockets.service';
 import { useSelector } from 'react-redux';
 import { useState } from 'react';
 import { IQueueState } from '@winter-sports/game-lib';

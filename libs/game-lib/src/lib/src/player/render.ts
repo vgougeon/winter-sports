@@ -3,6 +3,7 @@ import { BasePlayer } from "./player";
 import * as BABYLON from 'babylonjs';
 import 'babylonjs-loaders';
 import { SmoothAnimation } from "../misc/smoothAnimations";
+import { map } from "rxjs";
 
 export class PlayerRenderer {
     mesh?: BABYLON.AbstractMesh;
@@ -26,9 +27,9 @@ export class PlayerRenderer {
     render(dt: number) {
         this.animate(dt)
         this.animatables?.loop()
-        if(this.lookAt && this.HEAD) {
+        if (this.lookAt && this.HEAD) {
             this.HEAD.lookAt(this.lookAt.position, -Math.PI / 2, 0, 0, BABYLON.Space.WORLD)
-            if(this.HEAD.rotationQuaternion!.y > 0.5) this.HEAD.rotationQuaternion!.y = 0
+            if (this.HEAD.rotationQuaternion!.y > 0.5) this.HEAD.rotationQuaternion!.y = 0
             this.HEAD.rotationQuaternion!.z = 0
             this.HEAD.rotationQuaternion!.x = 0
         }
@@ -49,7 +50,7 @@ export class PlayerRenderer {
     }
 
     destroy() {
-        for(let animation of this.animations) animation.dispose()
+        for (let animation of this.animations) animation.dispose()
         this.mesh?.dispose()
     }
 

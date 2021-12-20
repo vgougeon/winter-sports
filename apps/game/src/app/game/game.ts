@@ -1,6 +1,6 @@
 import * as BABYLON from 'babylonjs';
 import { Game as GameInstance, TICK_RATE } from '@winter-sports/game-lib'
-import socketService from '../services/socket.service';
+import socketService from '../services/sockets.service';
 export class Game {
     game: GameInstance
     engine: BABYLON.Engine

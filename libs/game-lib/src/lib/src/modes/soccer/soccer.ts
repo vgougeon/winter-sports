@@ -5,12 +5,14 @@ import { SoccerPlayer } from './player';
 import { SoccerWorld } from './world';
 import * as BABYLON from 'babylonjs';
 import { SoccerFSM } from './soccerFSM';
+import { SoccerUI } from './soccerUI';
 
 export class Soccer {
     world!: SoccerWorld
     ball!: SoccerBall;
     players: SoccerPlayer[] = [];
     fsm!: SoccerFSM;
+    ui!: SoccerUI;
     loopCall = this.loop.bind(this)
     constructor(private game: Game) {}
 
@@ -19,14 +21,10 @@ export class Soccer {
         this.ball = new SoccerBall(this.game, this)
         this.players = [
             new SoccerPlayer(this.game, this, 0),
-            new SoccerPlayer(this.game, this, 0),
-            new SoccerPlayer(this.game, this, 0),
-            new SoccerPlayer(this.game, this, 1),
-            new SoccerPlayer(this.game, this, 1),
-            new SoccerPlayer(this.game, this, 1),
         ]
         this.players[0].setSelf()
         this.fsm = new SoccerFSM(this.game, this)
+        this.ui = new SoccerUI(this.game, this)
         this.game.scene.registerBeforeRender(this.loopCall)
     }
 
@@ -78,6 +76,7 @@ export class Soccer {
     loop() {
         this.ball.update()
         this.fsm.transition()
+        this.ui.update()
     }
 
     destroy() {
@@ -86,4 +85,6 @@ export class Soccer {
         this.ball.destroy()
         for(let player of this.players) player.destroy()
     }
+
+
 }

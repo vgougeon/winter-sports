@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form'
 import { GiDiceFire } from 'react-icons/gi'
 import { motion } from 'framer-motion';
-import socketService from '../../services/socket.service';
+import socketService from '../../services/sockets.service';
 import { useEffect } from 'react';
 const gb = require('goby').init()
 function LoginScreen() {

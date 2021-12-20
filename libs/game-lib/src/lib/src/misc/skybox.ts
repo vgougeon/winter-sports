@@ -8,7 +8,7 @@ export class Skybox {
     skyboxNight!: Mesh;
     hemisphericLight!: BABYLON.HemisphericLight;
     light!: BABYLON.DirectionalLight
-    time: number = 0;
+    time: number = 12;
     shadowGenerator!: BABYLON.ShadowGenerator;
 
     constructor(private game: Game) { 

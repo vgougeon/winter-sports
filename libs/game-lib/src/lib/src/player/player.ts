@@ -35,7 +35,7 @@ export class BasePlayer {
         this.collider.isVisible = false
         this.collider.checkCollisions = true
         this.collider.physicsImpostor = new BABYLON.PhysicsImpostor(this.collider, BABYLON.PhysicsImpostor.BoxImpostor, 
-            { mass: 0, restitution: 5})
+            { mass: 0, restitution: 2})
         this.game.skybox.shadowGenerator.addShadowCaster(this.collider)
         this.renderer = new PlayerRenderer(this.game, this)
         this.game.scene.registerBeforeRender(this.loopCall)

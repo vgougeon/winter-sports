@@ -42,7 +42,7 @@ export class SoccerFSM {
                 setTimeout(() => this.state.celebration = false, 3000)
                 break;
             case 'GAME_OVER':
-                this.state.end = dayjs().add(20, 'seconds')
+                this.state.end = dayjs().add(5, 'minutes')
                 this.mode.gameOver()
                 break;
             case 'GAME_DESTROY':

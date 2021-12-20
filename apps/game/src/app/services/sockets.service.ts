@@ -1,6 +1,6 @@
 import { io, Socket } from "socket.io-client";
 import { Game as GameInstance } from '@winter-sports/game-lib'
-import { Game } from './../game/game';
+import { Game } from '../game/game';
 import { resetSocket, setError, setFPS, setOnline } from "../store/socketSlice";
 import store from "../store/store";
 

@@ -3,13 +3,14 @@ import * as BABYLON from 'babylonjs';
 
 export class SoccerBall {
     mesh: BABYLON.Mesh;
-    maxSpeed = 400
+    maxSpeed = 140
     constructor(private game: Game, private mode: Soccer) {
         this.mesh = BABYLON.MeshBuilder.CreateSphere('ball', { diameter: 2 })
         this.mesh.physicsImpostor = new BABYLON.PhysicsImpostor(this.mesh,
             BABYLON.PhysicsImpostor.SphereImpostor, { mass: 5, restitution: 0.5 }
         )
         this.mesh.position.y = 10
+        this.game.skybox.shadowGenerator.addShadowCaster(this.mesh)
 
         const ballMaterial = new BABYLON.StandardMaterial("ball", this.game.scene);
         const texture = new BABYLON.Texture("assets/textures/amiga.jpg", this.game.scene);

@@ -2,6 +2,7 @@ import { Game } from '@winter-sports/game-lib';
 import { Soccer } from './soccer';
 import * as BABYLON from 'babylonjs'
 import gsap from 'gsap'
+import { setUVScale } from '../../misc/uv';
 
 export class SoccerWorld {
     field: BABYLON.Mesh;
@@ -16,7 +17,8 @@ export class SoccerWorld {
 
     settings = {
         width: 250, depth: 140, thickness: 1, borderHeight: 5,
-        borderTickness: 0.5, goalWidth: 40, goalHeight: 15, underOffset: 15
+        borderTickness: 0.5, goalWidth: 40, goalHeight: 15, underOffset: 15,
+        goalDepth: 20
     }
 
     destroy() {
@@ -39,7 +41,7 @@ export class SoccerWorld {
 
         if (this.game.canvas) {
             this.lines = this.createLines()
-            this.lights = this.createLights()
+            // this.lights = this.createLights()
             this.applyTextures()
             this.enableShadows()
         }
@@ -61,9 +63,9 @@ export class SoccerWorld {
     }
 
     createUnder() {
-        const under = BABYLON.MeshBuilder.CreateDisc('under', { radius: this.settings.width })
-        under.rotation.x = Math.PI / 2
-        under.position.y = -1
+        // const under = BABYLON.MeshBuilder.CreateDisc('under', { radius: this.settings.width })
+        const under = BABYLON.MeshBuilder.CreateBox('under', { width: this.settings.width + this.settings.goalDepth * 2, height: 0.5, depth: this.settings.goalWidth})
+        under.position.y = -0.51
         under.physicsImpostor = new BABYLON.PhysicsImpostor(under,
             BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 1, friction: 10 }, this.game.scene);
         under.checkCollisions = true
@@ -113,7 +115,7 @@ export class SoccerWorld {
 
     createBorders() {
         const borders: BABYLON.Mesh[] = []
-        const physics = { mass: 0, restitution: 1 }
+        const physics = { mass: 0, restitution: 1.5 }
         const { width, depth, borderHeight, borderTickness, goalWidth, goalHeight } = this.settings;
         //SIDES
         borders[0] = BABYLON.MeshBuilder.CreateBox('border1', { width: width, height: borderHeight, depth: borderTickness })
@@ -194,9 +196,8 @@ export class SoccerWorld {
     }
 
     createGoals() {
-        const { goalHeight, goalWidth, width } = this.settings
+        const { goalHeight, goalWidth, width, goalDepth } = this.settings
         const diameter = 1.5
-        const goalDepth = 10
         const goalMaterial = new BABYLON.StandardMaterial('goal', this.game.scene)
         goalMaterial.specularColor = new BABYLON.Color3(0, 0, 0)
         goalMaterial.ambientColor = new BABYLON.Color3(0, 0, 0)
@@ -236,8 +237,31 @@ export class SoccerWorld {
             g[7] = BABYLON.MeshBuilder.CreateCylinder(`goal${direction}`, { height: goalWidth, diameter: diameter / 2, tessellation: 8 })
             g[7].position = new BABYLON.Vector3(direction * width / 2 + direction * goalDepth, goalHeight - 0.7, 0)
             g[7].rotation.x = Math.PI / 2
-
             for(let mesh of g) mesh.material = goalMaterial
+
+            g[8] = BABYLON.MeshBuilder.CreateBox(`goal${direction}`, { height: goalHeight, width: goalWidth, depth: 0.5 })
+            g[8].position = new BABYLON.Vector3(direction * width / 2 + direction * goalDepth, goalHeight / 2, 0)
+            g[8].rotation.y = Math.PI / 2
+            g[8].checkCollisions = true
+            g[8].physicsImpostor = new BABYLON.PhysicsImpostor(g[8], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.5 })
+
+            g[9] = BABYLON.MeshBuilder.CreateBox(`goal${direction}`, { height: goalHeight, width: goalDepth, depth: 0.5 })
+            g[9].position = new BABYLON.Vector3(direction * width / 2 + direction * goalDepth / 2, goalHeight / 2, goalWidth / 2)
+            g[9].checkCollisions = true
+            g[9].physicsImpostor = new BABYLON.PhysicsImpostor(g[9], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.5 })
+
+            g[10] = BABYLON.MeshBuilder.CreateBox(`goal${direction}`, { height: goalHeight, width: goalDepth, depth: 0.5 })
+            g[10].position = new BABYLON.Vector3(direction * width / 2 + direction * goalDepth / 2, goalHeight / 2, - goalWidth / 2)
+            g[10].checkCollisions = true
+            g[10].physicsImpostor = new BABYLON.PhysicsImpostor(g[10], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.5 })
+
+            g[11] = BABYLON.MeshBuilder.CreateBox(`goal${direction}`, { height: goalDepth, width: goalWidth, depth: 0.5 })
+            g[11].position = new BABYLON.Vector3(direction * width / 2 + direction * goalDepth / 2, goalHeight - 0.7, 0)
+            g[11].rotation.y = Math.PI / 2
+            g[11].rotation.x = Math.PI / 2
+            g[11].checkCollisions = true
+            g[11].physicsImpostor = new BABYLON.PhysicsImpostor(g[11], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.5 })
+
 
             return g
         }
@@ -249,12 +273,14 @@ export class SoccerWorld {
         this.redGoalZone = BABYLON.MeshBuilder.CreateBox('redGoalZone', {
             width: goalDepth, height: goalHeight - 3, depth: goalWidth - 3, sideOrientation: BABYLON.Mesh.BACKSIDE
         })
+        this.redGoalZone.isVisible = false
         this.redGoalZone.position = new BABYLON.Vector3(width / 2 + (goalDepth / 2 + 3), goalHeight / 2 - 1, 0)
 
 
         this.blueGoalZone = BABYLON.MeshBuilder.CreateBox('blueGoalZone', {
             width: goalDepth, height: goalHeight - 3, depth: goalWidth - 3, sideOrientation: BABYLON.Mesh.BACKSIDE
         })
+        this.blueGoalZone.isVisible = false
         this.blueGoalZone.position = new BABYLON.Vector3(-width / 2 - (goalDepth / 2 + 3), goalHeight / 2 - 1, 0)
     }
 
@@ -293,7 +319,7 @@ export class SoccerWorld {
         //#region Under the pitch
         const under = new BABYLON.StandardMaterial("under", this.game.scene);
         under.specularColor = new BABYLON.Color3(0, 0, 0)
-        const t2 = new BABYLON.Texture("assets/textures/pitch2.png", this.game.scene);
+        const t2 = new BABYLON.Texture("assets/textures/sand.jpg", this.game.scene);
         t2.uScale = 6
         t2.vScale = 8
         under.ambientTexture = t2
@@ -324,9 +350,17 @@ export class SoccerWorld {
         texture.hasAlpha = true
         netMaterial.diffuseTexture = texture
         netMaterial.emissiveTexture = texture
-        // netMaterial.alpha = 1
-        this.blueGoalZone.material = netMaterial
-        this.redGoalZone.material = netMaterial
+        netMaterial.alpha = 0.5
+        const setNetMaterial = (mesh: BABYLON.Mesh) => {
+            if(!mesh.material) { 
+                const size = mesh.getBoundingInfo().boundingBox.extendSize
+                mesh.material = netMaterial
+                setUVScale(mesh, size.x / 4, size.y / 8)
+            }
+        }
+
+        for(let mesh of this.redGoal) setNetMaterial(mesh)
+        for(let mesh of this.blueGoal) setNetMaterial(mesh)
         netMaterial.disableLighting = true
         //#endregion
     }
