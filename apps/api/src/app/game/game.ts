@@ -9,9 +9,11 @@ export class Game {
     game: GameInstance
  
 
-    constructor(players?: PlayerSocket[]) {
+    constructor(public players: PlayerSocket[], private gameMode: string) {
         this.engine = new BABYLON.NullEngine()
-        this.game = new GameInstance(this.engine, { isServer: true })
+        this.game = new GameInstance(this.engine)
+        this.game.init()
+        this.game.setMode(gameMode)
     }
 
 }

@@ -24,7 +24,7 @@ export class BasePlayer {
 
     destroy() {
         this.game.scene.unregisterBeforeRender(this.loopCall)
-        this.collider?.dispose() 
+        this.collider?.dispose()
         this.renderer.destroy()
         this.camera.destroy()
     }
@@ -34,36 +34,38 @@ export class BasePlayer {
         this.collider.ellipsoid = new BABYLON.Vector3(1, 2, 0.7);
         this.collider.isVisible = false
         this.collider.checkCollisions = true
-        this.collider.physicsImpostor = new BABYLON.PhysicsImpostor(this.collider, BABYLON.PhysicsImpostor.BoxImpostor, 
-            { mass: 0, restitution: 2})
-        this.game.skybox.shadowGenerator.addShadowCaster(this.collider)
-        this.renderer = new PlayerRenderer(this.game, this)
+        this.collider.physicsImpostor = new BABYLON.PhysicsImpostor(this.collider, BABYLON.PhysicsImpostor.BoxImpostor,
+            { mass: 0, restitution: 2 })
+        if (this.game.canvas) {
+            this.game.skybox.shadowGenerator.addShadowCaster(this.collider)
+            this.renderer = new PlayerRenderer(this.game, this)
+            this.nameplate = new PlayerNameplate(this.game, this)
+        }
         this.game.scene.registerBeforeRender(this.loopCall)
         this.camera = new PlayerCamera(this.game, this)
-        this.nameplate = new PlayerNameplate(this.game, this)
     }
 
     loop() {
         const dt = this.game.engine.getDeltaTime()
 
         const initialPosition = this.collider.position.clone()
-        
-        if(this.id === 'SELF') { this.inputs = this.game.input?.getInputs() || {}}
+
+        if (this.id === 'SELF') { this.inputs = this.game.input?.getInputs() || {} }
         else this.inputs = {}
         const X = (this.inputs['UP'] || 0) * -1 + (this.inputs['DOWN'] || 0) * 1
         const Z = (this.inputs['RIGHT'] || 0) * 1 + (this.inputs['LEFT'] || 0) * -1
 
         this.acceleration = new BABYLON.Vector3(X, 0, Z)
-        if(this.acceleration.length() > 1) this.acceleration = this.acceleration.normalize()
-        if(this.inputs['RIGHT_TRIGGER']) this.acceleration = this.acceleration.scaleInPlace(dt / this.sprintDeltaSpeed)
+        if (this.acceleration.length() > 1) this.acceleration = this.acceleration.normalize()
+        if (this.inputs['RIGHT_TRIGGER']) this.acceleration = this.acceleration.scaleInPlace(dt / this.sprintDeltaSpeed)
         else this.acceleration = this.acceleration.scaleInPlace(dt / this.deltaSpeed)
-        
+
         this.velocity = this.velocity.add(this.acceleration)
-        
-        
+
+
         if (this.velocity.length() > 0.001) this.collider.lookAt(this.collider.position.subtract(this.velocity))
-        
-        if(this.inputs['A'] && this.realGravityVelocity.y === 0) {
+
+        if (this.inputs['A'] && this.realGravityVelocity.y === 0) {
             this.realGravityVelocity.y = 0.4
         }
         //GRAVITY
@@ -75,7 +77,7 @@ export class BasePlayer {
         this.camera.update(dt)
 
         this.realGravityVelocity = this.collider.position.subtract(initialPosition).maximizeInPlaceFromFloats(0, -2, 0).scaleInPlace(0.99)
-        
+
         this.velocity = this.velocity.scaleInPlace(0.85)
         // this.gravityVelocity = this.gravityVelocity.scaleInPlace(0.80)
     }
@@ -83,6 +85,6 @@ export class BasePlayer {
     setSelf() {
         this.id = 'SELF'
         this.game.scene.switchActiveCamera(this.camera.camera)
-    }   
+    }
 
 }

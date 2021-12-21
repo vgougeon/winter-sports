@@ -10,7 +10,8 @@ export class SoccerBall {
             BABYLON.PhysicsImpostor.SphereImpostor, { mass: 5, restitution: 0.5 }
         )
         this.mesh.position.y = 10
-        this.game.skybox.shadowGenerator.addShadowCaster(this.mesh)
+
+        if(this.game.canvas) this.game.skybox.shadowGenerator.addShadowCaster(this.mesh)
 
         const ballMaterial = new BABYLON.StandardMaterial("ball", this.game.scene);
         const texture = new BABYLON.Texture("assets/textures/amiga.jpg", this.game.scene);

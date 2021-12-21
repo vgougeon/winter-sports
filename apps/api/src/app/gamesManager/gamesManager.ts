@@ -7,8 +7,8 @@ class GamesManager {
         console.log("Game manager ON")
     }
 
-    createGame(players: PlayerSocket[]) {
-        const game = new Game(players)
+    createGame(players: PlayerSocket[], gameMode: string) {
+        const game = new Game(players, gameMode)
         this.games.push(game)
         return game
     }

@@ -3,7 +3,6 @@ import { BasePlayer } from "./player";
 import * as BABYLON from 'babylonjs';
 import 'babylonjs-loaders';
 import { SmoothAnimation } from "../misc/smoothAnimations";
-import { map } from "rxjs";
 
 export class PlayerRenderer {
     mesh?: BABYLON.AbstractMesh;

@@ -26,7 +26,6 @@ export interface IPlayerState {
 
 export interface IGameOptions {
     canvas?: HTMLCanvasElement,
-    isServer?: boolean
 }
 
 export interface IGameMode {

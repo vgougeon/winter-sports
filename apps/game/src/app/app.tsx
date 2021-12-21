@@ -12,7 +12,6 @@ export function App() {
   useLayoutEffect(() => {
     init()
     window.addEventListener('resize', () => {
-      console.log("RESIZE")
       gameService.game?.engine.resize()
     })
   }, [])
