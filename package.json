@@ -4,8 +4,8 @@
   "license": "MIT",
   "scripts": {
     "startAPI": "nx serve api",
-    "start": "nx serve",
-    "build": "nx build",
+    "start": "node dist/apps/api/main.js",
+    "build": "nx run-many --target=build --projects=api,game",
     "test": "nx test"
   },
   "private": true,
