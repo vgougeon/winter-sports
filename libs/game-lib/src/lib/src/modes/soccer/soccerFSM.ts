@@ -25,7 +25,7 @@ export class SoccerFSM {
     }
 
 
-    setState(to: string) {
+    changeState(to: string) {
         console.debug(`${this.currentState} >>> ${to}`)
         this.currentState = to
 
@@ -52,7 +52,7 @@ export class SoccerFSM {
     }
 
     checkState(from: string, to: string, condition: Function) {
-        if (from === this.currentState && condition()) this.setState(to)
+        if (from === this.currentState && condition()) this.changeState(to)
     }
 
     isPlayerReady() {
@@ -88,5 +88,18 @@ export class SoccerFSM {
         if (Math.abs(this.mode.ball.mesh.position.z) > this.mode.world.settings.depth / 2 + 10) return true
         if (Math.abs(this.mode.ball.mesh.position.x) > this.mode.world.settings.width / 2 + 10) return true
         return false
+    }
+
+    getState() {
+        return {
+            currentState: this.currentState,
+            state: this.state
+        }
+    }
+
+    setState(state: any) {
+        state.state.end = dayjs(state.state.end)
+        this.state = state.state
+        if(this.currentState !== state.currentState) this.changeState(state.currentState)
     }
 }

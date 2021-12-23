@@ -7,10 +7,12 @@ import { PlayerNameplate } from './nameplate';
 
 export class BasePlayer {
     public id?: string;
+    public pseudo?: string;
     public collider!: BABYLON.Mesh;
+    serverPosition?: BABYLON.Vector3;
     renderer!: PlayerRenderer;
     camera!: PlayerCamera;
-    inputs?: IInputMap;
+    inputs: IInputMap = {};
     acceleration = new BABYLON.Vector3(0, 0, 0);
     velocity = new BABYLON.Vector3(0, 0, 0);
     gravityVelocity = new BABYLON.Vector3(0, 0, 0);
@@ -25,12 +27,12 @@ export class BasePlayer {
     destroy() {
         this.game.scene.unregisterBeforeRender(this.loopCall)
         this.collider?.dispose()
-        this.renderer.destroy()
+        if(this.renderer) this.renderer.destroy()
         this.camera.destroy()
     }
 
     init() {
-        this.collider = BABYLON.MeshBuilder.CreateBox('player_collider', { width: 2, height: 4, depth: 1.3 }, this.game.scene)
+        this.collider = BABYLON.MeshBuilder.CreateBox('player_collider', { width: 2.5, height: 4, depth: 1.7 }, this.game.scene)
         this.collider.ellipsoid = new BABYLON.Vector3(1, 2, 0.7);
         this.collider.isVisible = false
         this.collider.checkCollisions = true
@@ -50,8 +52,7 @@ export class BasePlayer {
 
         const initialPosition = this.collider.position.clone()
 
-        if (this.id === 'SELF') { this.inputs = this.game.input?.getInputs() || {} }
-        else this.inputs = {}
+        if (this.id === 'SELF' || this.id === this.game.selfId) { this.inputs = this.game.input?.getInputs() || {} }
         const X = (this.inputs['UP'] || 0) * -1 + (this.inputs['DOWN'] || 0) * 1
         const Z = (this.inputs['RIGHT'] || 0) * 1 + (this.inputs['LEFT'] || 0) * -1
 
@@ -73,18 +74,32 @@ export class BasePlayer {
         this.collider.moveWithCollisions(this.velocity)
         this.collider.moveWithCollisions(this.gravityVelocity)
 
-        this.renderer.render(dt)
+        if(this.renderer) this.renderer.render(dt)
         this.camera.update(dt)
 
         this.realGravityVelocity = this.collider.position.subtract(initialPosition).maximizeInPlaceFromFloats(0, -2, 0).scaleInPlace(0.99)
 
         this.velocity = this.velocity.scaleInPlace(0.85)
         // this.gravityVelocity = this.gravityVelocity.scaleInPlace(0.80)
+        if(this.serverPosition) {
+            const distance = this.serverPosition.subtract(this.collider.position)
+            this.collider.position = this.collider.position.add(distance.scale(0.40))
+        }
     }
 
     setSelf() {
-        this.id = 'SELF'
         this.game.scene.switchActiveCamera(this.camera.camera)
+    }
+
+    setId(id: string) {
+        
+        this.id = id
+        console.debug(this.id, this.game.selfId)
+        if(this.id === this.game.selfId) this.game.scene.switchActiveCamera(this.camera.camera)
+    }
+
+    setPseudo(pseudo: string) {
+        this.pseudo = pseudo
     }
 
 }

@@ -41,7 +41,7 @@ export class SoccerWorld {
 
         if (this.game.canvas) {
             this.lines = this.createLines()
-            // this.lights = this.createLights()
+            this.lights = this.createLights()
             this.applyTextures()
             this.enableShadows()
         }

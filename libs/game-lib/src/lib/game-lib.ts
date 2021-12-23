@@ -6,7 +6,7 @@ import { IInputMap } from '@winter-sports/game-lib';
 import { Playground } from './src/modes/playground/playground';
 import { Skybox } from './src/misc/skybox';
 import { Soccer } from './src/modes/soccer/soccer';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 BABYLON.Animation.AllowMatricesInterpolation = true;
 export class Game {
   canvas?: HTMLCanvasElement
@@ -17,7 +17,10 @@ export class Game {
   shadowGenerator?: BABYLON.ShadowGenerator;
   input?: Input;
   currentInputs: IInputMap = {};
-  mode?: Playground | any;
+  mode?: Soccer;
+  emitter = new Subject<{ event: string; args: any}>()
+  currentState = new BehaviorSubject<string>('title-screen')
+  selfId?: string;
 
   constructor(public engine: BABYLON.Engine, public options: IGameOptions = {}) {
     this.engine = engine
@@ -46,8 +49,7 @@ export class Game {
 
   setMode(mode: string) {
     console.log('INIT ' + mode)
-    if (mode === 'soccer') this.mode = new Soccer(this)
-
+    if (mode === 'Soccer') this.mode = new Soccer(this)
     if (this.mode) this.mode.init()
   }
 }

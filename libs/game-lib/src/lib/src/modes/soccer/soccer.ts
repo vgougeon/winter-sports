@@ -6,6 +6,7 @@ import { SoccerWorld } from './world';
 import * as BABYLON from 'babylonjs';
 import { SoccerFSM } from './soccerFSM';
 import { SoccerUI } from './soccerUI';
+import { PlayerSocket } from './../../../../../../../apps/api/src/types/player-socket.interface';
 
 export class Soccer {
     world!: SoccerWorld
@@ -14,18 +15,60 @@ export class Soccer {
     fsm!: SoccerFSM;
     ui!: SoccerUI;
     loopCall = this.loop.bind(this)
+    serverLoop = this.server.bind(this)
     constructor(private game: Game) {}
 
     init() {
         this.world = new SoccerWorld(this.game, this)
         this.ball = new SoccerBall(this.game, this)
-        this.players = [
-            new SoccerPlayer(this.game, this, 0),
-        ]
-        this.players[0].setSelf()
+        this.players = []
         this.fsm = new SoccerFSM(this.game, this)
         this.ui = new SoccerUI(this.game, this)
         this.game.scene.registerBeforeRender(this.loopCall)
+        if(!this.game.canvas) {
+            this.game.scene.registerBeforeRender(this.serverLoop)
+            this.game.emitter.next({ event: 'gInfo', args: this.gInfo() })
+            //TODO: Think about a way to send gInfo to newcomers
+        }
+        this.game.currentState.next('Soccer')
+    }
+
+    server() {
+        this.game.emitter.next({ event: 'g', args: this.getState()})
+    }
+
+    gInfo() {
+        return {
+            gameMode: "Soccer",
+        }
+    }
+    
+    getState() {
+        return {
+            ball: this.ball.getState(),
+            players: this.players.map(p => p.getState()),
+            ...this.fsm.getState()
+        }
+    }
+
+    setState(state: any) {
+        this.ball.setState(state.ball);
+        this.setPlayerState(state.players)
+        this.fsm.setState(state);
+    }
+
+    setPlayerState(players: any[]) {
+        for(let player of players) {
+            let currentPlayer = this.players.find(p => p.id === player.id)
+            if(!currentPlayer) {
+                console.debug()
+                currentPlayer = new SoccerPlayer(this.game, this, 0)
+                currentPlayer.setId(player.id)
+                currentPlayer.setPseudo(player.pseudo)
+                this.players.push(currentPlayer)
+            }
+            currentPlayer.setState(player)
+        }
     }
 
     kickOffPosition() {
@@ -64,7 +107,7 @@ export class Soccer {
             p.collider.position = new BABYLON.Vector3(startAt + (i+1) * spacing, 5, 0)
             console.log('lookAt over')
             p.collider.lookAt(overCamera.position, Math.PI, 0, 0, BABYLON.Space.WORLD)
-            p.renderer.lookAt = overCamera
+            if(p.renderer) p.renderer.lookAt = overCamera
         })
 
         this.ball.mesh.position = new BABYLON.Vector3(0, 20, 8)
@@ -84,6 +127,15 @@ export class Soccer {
         this.world.destroy()
         this.ball.destroy()
         for(let player of this.players) player.destroy()
+    }
+
+    addPlayers(players: PlayerSocket[]) {
+        for(let player of players) {
+            const p = new SoccerPlayer(this.game, this, 0)
+            p.id = player.id
+            p.pseudo = player.pseudo || 'John'
+            this.players.push(p)
+        }
     }
 
 

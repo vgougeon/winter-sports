@@ -5,7 +5,7 @@ class Queue {
     players: PlayerSocket[] = []
     loopIntervalId: NodeJS.Timeout
     gameModes = ['Soccer']
-
+    minPlayers = 1
     constructor() {
         this.loopIntervalId = setInterval(() => {
             this.checkQueue()
@@ -16,9 +16,9 @@ class Queue {
     checkQueue() {
         for (let gameMode of this.gameModes.reverse()) {
             const queue = this.players.filter(p => p.gamesModes.includes(gameMode))
-            for (let i = 0; i < Math.floor(queue.length / 2); i++) {
+            for (let i = 0; i < Math.floor(queue.length / this.minPlayers); i++) {
                 console.log("CREATING A GAME mode :", gameMode)
-                const players = queue.splice(0, 2)
+                const players = queue.splice(0, this.minPlayers)
                 this.createGame(players, gameMode)
                 this.players = this.players.filter(p => !players.includes(p))
             }

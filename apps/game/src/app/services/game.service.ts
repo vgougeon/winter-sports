@@ -5,6 +5,10 @@ import { resetSocket, setError, setFPS, setOnline } from "../store/socketSlice";
 import store from "../store/store";
 import { BehaviorSubject} from 'rxjs'
 
+interface IGInfo extends Record<string, any> {
+    gameMode: string;
+}
+
 export class GameService {
     socket: Socket | null = null;
     game: GameInstance | null = null;
@@ -17,10 +21,12 @@ export class GameService {
     error = new BehaviorSubject<string>('')
     fps = new BehaviorSubject<number>(0)
     socketStatus = new BehaviorSubject<boolean>(false)
+    currentState = new BehaviorSubject<string>('TitleScreen')
 
     async init(canvas: HTMLCanvasElement) {
         this.localGame = new Game(canvas)
         this.game = this.localGame.game
+        this.game.currentState = this.currentState
         await this.game.init()
 
         this.fpsLoopId = setInterval(() => this.fps.next(this.game?.engine.performanceMonitor.averageFPS || 0), 1000)
@@ -34,8 +40,30 @@ export class GameService {
                 transports: ['websocket']
             });
             this.socket.on('connect_error', () => this.socketStatus.next(false))
-            this.socket.on('connect', () => this.socketStatus.next(true))
+            this.socket.on('connect', () => {
+                this.game!.selfId = this.socket!.id 
+                return this.socketStatus.next(true)
+            })
+            this.socket.on('gInfo', (gInfo: IGInfo) => this.gInfo(gInfo))
+            this.socket.on('g', (g: any) => this.g(g))
         }
+    }
+
+    gInfo(gInfo: IGInfo) {
+        this.game?.setMode(gInfo.gameMode)
+    }
+
+    g(g: any) {
+        this.game?.mode?.setState(g)
+        this.i()
+    }
+
+    i() {
+        this.socket?.emit('i', this.game?.currentInputs)
+    }
+
+    joinQueue(gameModes: string[]) {
+        this.socket?.emit('queue', gameModes)
     }
 
     async connectTo(url: string) {

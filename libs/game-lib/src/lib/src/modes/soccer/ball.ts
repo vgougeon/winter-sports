@@ -9,6 +9,7 @@ export class SoccerBall {
         this.mesh.physicsImpostor = new BABYLON.PhysicsImpostor(this.mesh,
             BABYLON.PhysicsImpostor.SphereImpostor, { mass: 5, restitution: 0.5 }
         )
+        // if(this.game.canvas) this.mesh.physicsImpostor.mass = 0
         this.mesh.position.y = 10
 
         if(this.game.canvas) this.game.skybox.shadowGenerator.addShadowCaster(this.mesh)
@@ -40,6 +41,40 @@ export class SoccerBall {
 
         //
         
+    }
+
+    getState() {
+        const linear = this.mesh.physicsImpostor?.getLinearVelocity()
+        const angular = this.mesh.physicsImpostor?.getAngularVelocity()
+        return {
+            position: {
+                x: this.mesh.position.x,
+                y: this.mesh.position.y,
+                z: this.mesh.position.z,
+            },
+            linearVelocity: {
+                x: linear?.x,
+                y: linear?.y,
+                z: linear?.z,
+            },
+            angularVelocity: {
+                x: angular?.x,
+                y: angular?.y,
+                z: angular?.z,
+            }
+        }
+    }
+
+    setState(ballState: any) {
+        this.mesh.position.x = ballState.position.x;
+        this.mesh.position.y = ballState.position.y;
+        this.mesh.position.z = ballState.position.z;
+        this.mesh.physicsImpostor?.setAngularVelocity(
+            new BABYLON.Vector3(ballState.angularVelocity.x, ballState.angularVelocity.y, ballState.angularVelocity.z)
+        )
+        this.mesh.physicsImpostor?.setLinearVelocity(
+            new BABYLON.Vector3(ballState.linearVelocity.x, ballState.linearVelocity.y, ballState.linearVelocity.z)
+        )
     }
 
     destroy() {
