@@ -83,7 +83,7 @@ export class BasePlayer {
         // this.gravityVelocity = this.gravityVelocity.scaleInPlace(0.80)
         if(this.serverPosition) {
             const distance = this.serverPosition.subtract(this.collider.position)
-            this.collider.position = this.collider.position.add(distance.scale(0.40))
+            this.collider.position = this.collider.position.add(distance.scale(0.1))
         }
     }
 
