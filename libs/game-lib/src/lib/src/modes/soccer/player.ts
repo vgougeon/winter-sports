@@ -35,22 +35,11 @@ export class SoccerPlayer extends BasePlayer {
     }
 
     setState(playerState: any) {
-        if (this.id !== this.g.selfId) {
-            this.velocity.x = playerState.velocity.x
-            this.velocity.y = playerState.velocity.y
-            this.velocity.z = playerState.velocity.z
-            this.collider.position.x = playerState.position.x
-            this.collider.position.y = playerState.position.y
-            this.collider.position.z = playerState.position.z
-        }
-        else {
-            this.serverPosition = new BABYLON.Vector3(playerState.position.x, playerState.position.y, playerState.position.z)
-            // this.velocity.x = playerState.velocity.x
-            // this.velocity.y = playerState.velocity.y
-            // this.velocity.z = playerState.velocity.z
-        }
-
-
-
+        this.velocity.x = playerState.velocity.x
+        this.velocity.y = playerState.velocity.y
+        this.velocity.z = playerState.velocity.z
+        this.collider.position.x = playerState.position.x
+        this.collider.position.y = playerState.position.y
+        this.collider.position.z = playerState.position.z
     }
 }
