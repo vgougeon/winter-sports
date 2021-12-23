@@ -5,7 +5,7 @@ import { GiStaticGuard } from 'react-icons/gi';
 import { RiSettings3Fill } from 'react-icons/ri';
 import { BsConeStriped, BsFillBookmarkCheckFill, BsBookmark } from 'react-icons/bs'
 import { BiWorld } from 'react-icons/bi';
-import socketService from '../../services/socket.service';
+import socketService from '../../services/sockets.service';
 import { useSelector } from 'react-redux';
 import { useState } from 'react';
 import { IQueueState } from '@winter-sports/game-lib';
@@ -16,7 +16,7 @@ function TitleScreen() {
     const socket = useSelector((state: any) => state.socket)
     const [gameModes, setGameModes] = useState([4])
     const toggle = (gameMode: number) => {
-        if (queueState) socketService.leaveQueue()
+        if (queueState) {}
         if (gameModes.includes(gameMode)) setGameModes(gameModes.filter(v => v !== gameMode))
         else setGameModes([...gameModes, gameMode])
     }
@@ -57,15 +57,15 @@ function TitleScreen() {
                         active={gameModes.includes(6)} action={() => toggle(6)}>
                         3<span className="mx-1 text-sm">vs</span>3
                     </GameMode>
-                    {queueState && <TiCancel className="text-4xl text-white cursor-pointer" onClick={() => socketService.leaveQueue()} />}
+                    {queueState && <TiCancel className="text-4xl text-white cursor-pointer"/>}
                 </div>
-                <Button action={() => socketService.queue(gameModes)}>
+                <Button>
                     {!queueState ?
                         <FaVolleyballBall className='inline mr-4' />
                         : <BiLoaderAlt className='inline mr-4 rotate' />}
                     Quick Play
                 </Button>
-                <Button action={() => socketService.practice()}>
+                <Button>
                     <BsConeStriped className='inline mr-4' />
                     Practice
                 </Button>

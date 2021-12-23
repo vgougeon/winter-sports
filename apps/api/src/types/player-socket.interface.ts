@@ -4,5 +4,5 @@ export interface PlayerSocket extends Socket {
     pseudo?: string;
     user?: any;
     ping?: number;
-    gamesModes?: number[];
+    gamesModes?: string[];
 }

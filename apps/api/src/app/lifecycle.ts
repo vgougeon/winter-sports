@@ -10,7 +10,7 @@ io.on('connection', (socket: PlayerSocket) => {
         console.log("Client left", socket.id)
     })
 
-    socket.on('queue', (gameModes: number[] = [4]) => {
+    socket.on('queue', (gameModes: string[] = ['Soccer']) => {
         queue.addPlayer(socket, gameModes)
     })
 

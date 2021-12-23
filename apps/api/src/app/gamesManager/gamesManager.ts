@@ -7,10 +7,15 @@ class GamesManager {
         console.log("Game manager ON")
     }
 
-    createGame(players: PlayerSocket[]) {
-        const game = new Game(players)
+    async createGame(players: PlayerSocket[], gameMode: string) {
+        const game = new Game(players, gameMode)
+        await game.init()
         this.games.push(game)
         return game
+    }
+
+    remove(game: Game) {
+        this.games = this.games.filter(g => g !== game)
     }
 }
 

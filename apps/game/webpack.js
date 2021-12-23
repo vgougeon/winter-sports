@@ -71,7 +71,6 @@ function getWebpackConfig(config) {
         // add https://github.com/pmmmwh/react-refresh-webpack-plugin to webpack plugin
         config.plugins.push(new ReactRefreshPlugin());
     }
-    console.log("customize webpack cnfig")
     config.externals = { fs: 'empty', path: 'empty', "ammo.js": "Ammo" }
     return config;
 }

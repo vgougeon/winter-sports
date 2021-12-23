@@ -1,4 +1,5 @@
 import express, { Application } from 'express';
+import path from 'path';
 import SocketIO from "socket.io";
 
 const app: Application = express();
@@ -16,6 +17,11 @@ export const io: SocketIO.Server = socketIO(server, {
 app.get('/api', (req, res) => {
   res.send({ version: process.env.NX_VERSION });
 });
+
+app.use('/', express.static(path.join(__dirname, '../game/')))
+app.use('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../game/index.html'))
+})
 
 app.use(cookieParser());
 app.use(express.json());

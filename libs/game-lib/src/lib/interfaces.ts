@@ -12,6 +12,7 @@ export interface IGameState {
     }[],
     timer: string;
     delta: number;
+    state: string;
 }
 
 export interface IPlayerState {
@@ -25,11 +26,10 @@ export interface IPlayerState {
 
 export interface IGameOptions {
     canvas?: HTMLCanvasElement,
-    isServer?: boolean
 }
 
 export interface IGameMode {
-    name: 'Soccer' | 'Beach Volley' | 'Practice' | 'Title Screen';
+    name: 'Soccer' | 'Beach Volley' | 'Practice' | 'Title Screen' | 'Playground';
     fieldWidth?: number;
     fieldHeight?: number;
     time?: number; //seconds

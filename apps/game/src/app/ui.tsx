@@ -1,20 +1,15 @@
-import Queue from "./interface/absolute/queue";
-import Score from "./interface/absolute/score";
-import TitleScreen from "./interface/pages/title-screen";
-import Performance from './interface/absolute/performance';
-import { useSelector } from "react-redux";
-import LoginScreen from "./interface/pages/login-screen";
+import { useObservable, useRendersCount } from "react-use";
+import SoccerUI from "./interface/games/soccer-ui";
+import gameService from "./services/game.service";
 
 export function UI() {
-    const mode = useSelector((state: any) => state.game.mode)
-    const pseudo = useSelector((state: any) => state.socket.pseudo)
-    if(!pseudo) return <LoginScreen />
+    const socketStatus = useObservable(gameService.socketStatus)
+    const state = useObservable(gameService.currentState)
+    const renders = useRendersCount()
     return (
         <>
-            {mode === 'title-screen' && <TitleScreen />}
-            <Queue />
-            <Performance />
-            <Score />
+        { state === 'Soccer' && <SoccerUI />}
+        <div className={`absolute w-4 h-4 rounded-full top-2 right-2 ${socketStatus ? 'bg-green-500' : 'bg-red-600'}`}></div>
         </>
     )
 }

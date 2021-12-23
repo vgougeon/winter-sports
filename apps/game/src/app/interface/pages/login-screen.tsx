@@ -1,12 +1,18 @@
 import { useForm } from 'react-hook-form'
 import { GiDiceFire } from 'react-icons/gi'
 import { motion } from 'framer-motion';
-import socketService from '../../services/socket.service';
+import socketService from '../../services/sockets.service';
+import { useEffect } from 'react';
 const gb = require('goby').init()
 function LoginScreen() {
     const { register, handleSubmit, setValue, formState: { errors } } = useForm();
+    useEffect(() => {
+        const pseudo = localStorage.getItem('pseudo')
+        // if(pseudo) socketService.setPseudo(pseudo)
+    })
     const submit = (data: { pseudo: string }) => {
-        socketService.setPseudo(data.pseudo)
+        // socketService.setPseudo(data.pseudo)
+        localStorage.setItem('pseudo', data.pseudo)
     }
     return (
         <motion.form initial={{ opacity: 0, scale: 1.2 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.2 }}

@@ -1,6 +1,7 @@
 import * as BABYLON from 'babylonjs';
 import { Game as GameInstance, TICK_RATE } from '@winter-sports/game-lib'
-import socketService from '../services/socket.service';
+
+
 export class Game {
     game: GameInstance
     engine: BABYLON.Engine
@@ -18,8 +19,8 @@ export class Game {
 
     loop() {
         if(this.game.input) this.game.currentInputs = this.game.input.getInputs()
-        if(this.game.input && this.game.self) {
-            socketService.input(this.game.currentInputs)
-        }
+        // if(this.game.input && this.game.self) {
+        //     socketService.input(this.game.currentInputs)
+        // }
     }
 }
