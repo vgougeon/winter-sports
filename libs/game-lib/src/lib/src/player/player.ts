@@ -92,10 +92,9 @@ export class BasePlayer {
     }
 
     setId(id: string) {
-        
         this.id = id
         console.debug(this.id, this.game.selfId)
-        if(this.id === this.game.selfId) this.game.scene.switchActiveCamera(this.camera.camera)
+        if(this.id === this.game.selfId || this.id === 'SELF') this.game.scene.switchActiveCamera(this.camera.camera)
     }
 
     setPseudo(pseudo: string) {
