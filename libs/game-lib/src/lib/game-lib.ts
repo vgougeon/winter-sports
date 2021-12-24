@@ -7,6 +7,7 @@ import { Playground } from './src/modes/playground/playground';
 import { Skybox } from './src/misc/skybox';
 import { Soccer } from './src/modes/soccer/soccer';
 import { BehaviorSubject, Subject } from 'rxjs';
+import { SoccerPlayer } from './src/modes/soccer/player';
 BABYLON.Animation.AllowMatricesInterpolation = true;
 export class Game {
   canvas?: HTMLCanvasElement
@@ -45,6 +46,13 @@ export class Game {
   async init() {
     const ammo = await Ammo()
     this.scene.enablePhysics(new BABYLON.Vector3(0, -40, 0), new BABYLON.AmmoJSPlugin(true, ammo))
+
+    // this.setMode('Soccer')
+    // if(this.mode) {
+    //   this.mode.players = [ new SoccerPlayer(this, this.mode!, 0)]
+    //   this.mode.players[0].setId('SELF')
+    // }
+    
   }
 
   setMode(mode: string) {

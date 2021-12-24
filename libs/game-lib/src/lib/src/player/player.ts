@@ -27,7 +27,7 @@ export class BasePlayer {
     destroy() {
         this.game.scene.unregisterBeforeRender(this.loopCall)
         this.collider?.dispose()
-        if(this.renderer) this.renderer.destroy()
+        if (this.renderer) this.renderer.destroy()
         this.camera.destroy()
     }
 
@@ -87,6 +87,8 @@ export class BasePlayer {
         }
     }
 
+
+
     setSelf() {
         this.game.scene.switchActiveCamera(this.camera.camera)
     }
@@ -94,7 +96,7 @@ export class BasePlayer {
     setId(id: string) {
         this.id = id
         console.debug(this.id, this.game.selfId)
-        if(this.id === this.game.selfId || this.id === 'SELF') this.game.scene.switchActiveCamera(this.camera.camera)
+        if (this.id === this.game.selfId || this.id === 'SELF') this.game.scene.switchActiveCamera(this.camera.camera)
     }
 
     setPseudo(pseudo: string) {
