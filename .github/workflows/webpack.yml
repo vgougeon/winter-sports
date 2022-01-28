@@ -18,6 +18,9 @@ jobs:
         node-version: 16.x
 
     - name: Build
+      env:
+        NX_GAME_URL: ${{ secrets.NX_GAME_URL }}
+        NX_WEBSOCKET_URL: ${{ secrets.NX_WEBSOCKET_URL }}
       run: |
         npm install
         npm run build
