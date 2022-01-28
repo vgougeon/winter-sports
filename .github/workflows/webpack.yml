@@ -29,4 +29,5 @@ jobs:
       with:
         force: true
         commit-files: dist
-        remote: build
+        ref: refs/heads/main
+        remote-ref: refs/heads/build
