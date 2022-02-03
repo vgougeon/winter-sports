@@ -1,0 +1,15 @@
+FROM node:16-alpine
+
+COPY . /usr/src/app
+WORKDIR /usr/src/app
+
+ARG NX_GAME_URL
+ARG NX_WEBSOCKET_URL
+
+ENV NX_GAME_URL=$NX_GAME_URL
+ENV NX_WEBSOCKET_URL=$NX_WEBSOCKET_URL
+
+RUN npm install
+RUN npm run build
+
+ENTRYPOINT npm start
